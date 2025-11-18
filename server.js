@@ -10,7 +10,8 @@ const path = require('path');
 const app = express();
 app.use(cors());
 app.use(bodyParser.json());
-app.use(express.static(path.join(__dirname, 'frontend')));
+// Serve the front-end static files (folder is named `new front` in this repo)
+app.use(express.static(path.join(__dirname, 'newfront')));
 
 // إعداد اتصال MySQL — مُعدّل حسب طلبك
 const dbConfig = {
@@ -152,7 +153,7 @@ app.get('/api/ledger', async (req, res) => {
 
 // Serve frontend index
 app.get('/', (req, res) => {
-  res.sendFile(path.join(__dirname, 'frontend', 'index.html'));
+  res.sendFile(path.join(__dirname, 'newfront', 'index.html'));
 });
 
 const PORT = process.env.PORT || 3000;
