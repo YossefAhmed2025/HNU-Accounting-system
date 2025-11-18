@@ -1,0 +1,51 @@
+<!doctype html>
+<html lang="ar" dir="rtl">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>إقفال السنة وترحيل الأرصدة - HNU</title>
+  <link rel="stylesheet" href="styles.css" />
+  <link rel="stylesheet" href="modules.css" />
+</head>
+<body>
+  <header class="topbar">
+    <div class="brand">
+      <img src="logo.png" alt="HNU logo" class="brand-logo" />
+      <span class="brand-text">HNU — النظام المحاسبي</span>
+    </div>
+  </header>
+  <main class="container">
+    <section class="module-card">
+      <h2>إقفال السنة وترحيل الأرصدة</h2>
+      <div id="summary"></div>
+      <div style="margin-top:12px">
+        <button id="btn-close-accounts" class="primary">إقفال حسابات الإيرادات والمصروفات</button>
+        <button id="btn-rollover" class="muted-btn">ترحيل الرصيد الافتتاحي للسنة الجديدة</button>
+      </div>
+      <div id="audit-log" style="margin-top:16px"></div>
+    </section>
+  </main>
+  <script src="admin-modules.js"></script>
+  <script>
+    async function loadSummary(){
+      // For demo we pull accounts and compute basic totals
+      const res = await AdminAPI.apiFetch('/api/accounts');
+      const acc = res.accounts||[];
+      const rev = acc.filter(a=>a.type==='revenue').reduce((s,x)=>s+x.balance,0);
+      const exp = acc.filter(a=>a.type==='expense').reduce((s,x)=>s+x.balance,0);
+      document.getElementById('summary').innerHTML=`<p>إجمالي الإيرادات: ${rev}</p><p>إجمالي المصروفات: ${exp}</p>`;
+    }
+    document.getElementById('btn-close-accounts').addEventListener('click',async function(){
+      const pwd = prompt('أدخل كلمة مرور المسؤول لتأكيد الإقفال'); if(!pwd) return; if(!confirm('تأكيد نهائي لإقفال حسابات الإيرادات والمصروفات؟')) return;
+      const res = await AdminAPI.apiFetch('/api/year/close',{method:'POST',body:JSON.stringify({password:pwd})});
+      document.getElementById('audit-log').textContent = (res.log||[]).join('\n'); alert('تمت العملية');
+    })
+    document.getElementById('btn-rollover').addEventListener('click',async function(){
+      const pwd = prompt('أدخل كلمة مرور المسؤول لتأكيد الترحيل'); if(!pwd) return; if(!confirm('تأكيد الترحيل للسنة الجديدة؟')) return;
+      const res = await AdminAPI.apiFetch('/api/year/rollover',{method:'POST',body:JSON.stringify({password:pwd})});
+      document.getElementById('audit-log').textContent = (res.log||[]).join('\n'); alert('تمت العملية');
+    })
+    loadSummary();
+  </script>
+</body>
+</html>

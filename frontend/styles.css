@@ -1,0 +1,56 @@
+:root{
+  --bg:#0b1a26;
+  --card:#0f2a44;
+  --muted:#98a0aa;
+  --accent:#06b6d4;
+  --accent-2:#3b82f6;
+  --glass: rgba(255,255,255,0.05);
+  --radius:12px;
+  --maxw:1100px;
+}
+*{box-sizing:border-box;font-family:Inter, 'Segoe UI', Tahoma, 'Noto Naskh Arabic', sans-serif}
+html,body{height:100%;margin:0;padding:0;background:linear-gradient(180deg,#071227 0%, #0b1a26 100%);color:#e6eef6}
+.topbar{display:flex;align-items:center;justify-content:space-between;padding:14px 20px;backdrop-filter:blur(6px);background:linear-gradient(90deg, rgba(255,255,255,0.02), rgba(255,255,255,0.01));box-shadow:0 6px 24px rgba(2,6,23,0.6)}
+.brand{font-weight:700;color:var(--accent);font-size:16px}
+.nav .btn{margin-left:8px;padding:8px 12px;border-radius:10px;border:1px solid rgba(255,255,255,0.03);background:linear-gradient(90deg,#0f2a44,#0b1a26);color:var(--muted);cursor:pointer;transition:.3s}
+.nav .btn:hover{background:linear-gradient(90deg,var(--accent),var(--accent-2));color:#001}
+.container{max-width:var(--maxw);margin:24px auto;padding:0 16px;display:grid;grid-template-columns:1fr;gap:18px}
+.page{background:transparent;padding:0}
+.card{background:linear-gradient(180deg, rgba(255,255,255,0.02), rgba(255,255,255,0.01));padding:14px;border-radius:var(--radius);box-shadow:0 8px 30px rgba(2,6,23,0.6);border:1px solid rgba(255,255,255,0.03)}
+h2{margin:0 0 12px 0;color:var(--accent)}
+label{display:block;margin-bottom:10px;color:var(--muted);font-size:14px}
+input,select{padding:6px 8px;border-radius:6px;border:none;background:#0b2a44;color:#fff;width:100%;margin-top:4px}
+button.primary{background:linear-gradient(90deg,var(--accent),var(--accent-2));color:#fff;border:none;padding:8px 16px;margin-top:10px;border-radius:8px;cursor:pointer;transition:.3s}
+button.primary:hover{opacity:.85}
+table{width:100%;border-collapse:collapse;margin-top:12px}
+table th,table td{padding:8px;text-align:center;border:1px solid rgba(255,255,255,0.1)}
+table th{background:rgba(6,182,212,0.2);color:#fff}
+.row{display:flex;gap:12px;flex-wrap:wrap}
+.row label{flex:1 1 200px}
+.btn.muted{background:#222;color:#888;border:none;border-radius:6px;cursor:pointer;transition:.2s}
+.btn.muted:hover{background:#555;color:#fff}
+
+/* Watermark background using the HNU logo (place `logo.png` in the same folder) */
+body{position:relative}
+body::before{
+  content:"";
+  position:fixed;
+  inset:0;
+  display:block;
+  background-image: url('logo.png');
+  background-repeat: no-repeat;
+  background-position: center center;
+  background-size: 70vmin; /* large, centered watermark */
+  opacity: 0.06; /* very light */
+  pointer-events: none;
+  z-index: 0;
+  filter: saturate(0) brightness(1);
+}
+
+/* Bring UI above the watermark */
+.topbar, .container, .card, header, main{position:relative;z-index:1}
+
+/* Brand / header logo */
+.brand{display:flex;align-items:center;gap:12px;font-weight:700;color:var(--accent);font-size:16px}
+.brand-logo{width:44px;height:auto;border-radius:6px;display:inline-block}
+.brand-text{line-height:1}

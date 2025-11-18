@@ -1,0 +1,38 @@
+<!doctype html>
+<html lang="ar" dir="rtl">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>حركة حساب - HNU</title>
+  <link rel="stylesheet" href="styles.css" />
+  <link rel="stylesheet" href="modules.css" />
+</head>
+<body>
+  <header class="topbar">
+    <div class="brand">
+      <img src="logo.png" alt="HNU logo" class="brand-logo" />
+      <span class="brand-text">HNU — النظام المحاسبي</span>
+    </div>
+  </header>
+  <main class="container">
+    <section class="module-card">
+      <h2>حركة على حساب</h2>
+      <div class="filter-row">
+        <select id="sel-account"></select>
+        <label>من<br><input id="from" type="date"></label>
+        <label>إلى<br><input id="to" type="date"></label>
+        <button id="btn-view" class="small-btn">عرض</button>
+      </div>
+      <div id="movements"></div>
+    </section>
+  </main>
+  <script src="admin-modules.js"></script>
+  <script>
+    async function init(){
+      const res = await AdminAPI.apiFetch('/api/accounts'); const sel=document.getElementById('sel-account'); res.accounts.forEach(a=>{const o=document.createElement('option');o.value=a.id;o.textContent=a.code+' - '+a.name; sel.appendChild(o)});
+      document.getElementById('btn-view').addEventListener('click',()=>{document.getElementById('movements').textContent='عرض الحركات (تجريبي)'});
+    }
+    init();
+  </script>
+</body>
+</html>

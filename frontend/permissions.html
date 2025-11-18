@@ -1,0 +1,48 @@
+<!doctype html>
+<html lang="ar" dir="rtl">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>صلاحيات - HNU</title>
+  <link rel="stylesheet" href="styles.css" />
+  <link rel="stylesheet" href="modules.css" />
+</head>
+<body>
+  <header class="topbar">
+    <div class="brand">
+      <img src="logo.png" alt="HNU logo" class="brand-logo" />
+      <span class="brand-text">HNU — النظام المحاسبي</span>
+    </div>
+  </header>
+  <main class="container">
+    <section class="module-card">
+      <h2>صلاحيات المستخدم</h2>
+      <form id="form-perm">
+        <input type="hidden" id="uid" name="id">
+        <div>
+          <label><input type="checkbox" name="perm_add_entry"> إضافة قيد</label><br>
+          <label><input type="checkbox" name="perm_post"> ترحيل</label><br>
+          <label><input type="checkbox" name="perm_reports"> عرض تقارير</label><br>
+          <label><input type="checkbox" name="perm_close_year"> إقفال السنة</label>
+        </div>
+        <div style="margin-top:10px">
+          <button class="primary">حفظ الصلاحيات</button>
+        </div>
+      </form>
+    </section>
+  </main>
+
+  <script src="admin-modules.js"></script>
+  <script>
+    const params=new URLSearchParams(location.search);const id=params.get('id');
+    if(id) document.getElementById('uid').value=id;
+    document.getElementById('form-perm').addEventListener('submit',async function(e){
+      e.preventDefault();
+      const f=Object.fromEntries(new FormData(e.target).entries());
+      const payload = {id:id,permissions:f};
+      const res = await AdminAPI.apiFetch('/api/users/permissions',{method:'POST',body:JSON.stringify(payload)});
+      if(res.success){alert('تم الحفظ');location.href='users-list.html'} else alert(res.error||'خطأ');
+    })
+  </script>
+</body>
+</html>

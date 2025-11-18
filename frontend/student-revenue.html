@@ -1,0 +1,40 @@
+<!doctype html>
+<html lang="ar" dir="rtl">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>إيرادات الطلاب - HNU</title>
+  <link rel="stylesheet" href="styles.css" />
+  <link rel="stylesheet" href="modules.css" />
+</head>
+<body>
+  <header class="topbar">
+    <div class="brand">
+      <img src="logo.png" alt="HNU logo" class="brand-logo" />
+      <span class="brand-text">HNU — النظام المحاسبي</span>
+    </div>
+  </header>
+  <main class="container">
+    <section class="module-card">
+      <h2>إيرادات الطلاب</h2>
+      <div class="filter-row">
+        <select id="sel-year"><option>2024/2025</option></select>
+        <select id="sel-fac"><option value="">كل الكليات</option></select>
+        <select id="sel-status"><option value="">كل الحالات</option><option value="paid">مدفوع</option><option value="due">مستحق</option></select>
+        <button id="btn-refresh" class="small-btn">عرض</button>
+      </div>
+      <div id="results"></div>
+    </section>
+  </main>
+  <script src="admin-modules.js"></script>
+  <script>
+    async function init(){
+      const f = await AdminAPI.apiFetch('/api/faculties'); const sel=document.getElementById('sel-fac'); f.faculties.forEach(x=>{const o=document.createElement('option');o.value=x.id; o.textContent=x.name; sel.appendChild(o)});
+      document.getElementById('btn-refresh').addEventListener('click',async ()=>{
+        const res = await AdminAPI.apiFetch('/api/revenues'); document.getElementById('results').textContent = JSON.stringify(res.rows||res,null,2);
+      })
+    }
+    init();
+  </script>
+</body>
+</html>

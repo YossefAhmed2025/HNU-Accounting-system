@@ -1,0 +1,47 @@
+<!doctype html>
+<html lang="ar" dir="rtl">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>دفتر اليومية - HNU</title>
+  <link rel="stylesheet" href="styles.css" />
+  <link rel="stylesheet" href="modules.css" />
+</head>
+<body>
+  <header class="topbar">
+    <div class="brand">
+      <img src="logo.png" alt="HNU logo" class="brand-logo" />
+      <span class="brand-text">HNU — النظام المحاسبي</span>
+    </div>
+  </header>
+  <main class="container">
+    <section class="module-card">
+      <h2>دفتر اليومية</h2>
+      <div class="filter-row">
+        <label>من<br><input id="from" type="date"></label>
+        <label>إلى<br><input id="to" type="date"></label>
+        <label>نوع<br><select id="type"><option value="">كل الأنواع</option><option value="debit">مدين</option><option value="credit">دائن</option></select></label>
+        <button id="btn-refresh" class="small-btn">تصفية</button>
+        <button id="btn-export" class="small-btn">تصدير</button>
+      </div>
+      <div class="responsive-table">
+        <table id="tbl-journal"><thead><tr><th>رقم القيد</th><th>التاريخ</th><th>البيان</th><th>مدين</th><th>دائن</th><th>عرض</th></tr></thead><tbody></tbody></table>
+      </div>
+    </section>
+  </main>
+  <script src="admin-modules.js"></script>
+  <script>
+    async function load(){
+      const res = await AdminAPI.apiFetch('/api/reports/journal');
+      const rows = res.rows||[]; render(rows);
+      document.getElementById('btn-refresh').addEventListener('click',()=>render(rows));
+      document.getElementById('btn-export').addEventListener('click',()=>alert('Export not implemented in demo'));
+    }
+    function render(rows){
+      const tbody=document.querySelector('#tbl-journal tbody');tbody.innerHTML='';
+      rows.forEach(r=>{const tr=document.createElement('tr');tr.innerHTML=`<td>${r.id}</td><td>${r.date}</td><td>${r.desc}</td><td>${r.debit||''}</td><td>${r.credit||''}</td><td><button class='small-btn' onclick="alert('عرض تفاصيل')">عرض</button></td>`;tbody.appendChild(tr)})
+    }
+    load();
+  </script>
+</body>
+</html>

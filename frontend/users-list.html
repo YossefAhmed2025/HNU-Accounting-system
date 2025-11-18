@@ -1,0 +1,88 @@
+<!doctype html>
+<html lang="ar" dir="rtl">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>إدارة المستخدمين - HNU</title>
+  <link rel="stylesheet" href="styles.css" />
+  <link rel="stylesheet" href="modules.css" />
+</head>
+<body>
+  <header class="topbar">
+    <div class="brand">
+      <img src="logo.png" alt="HNU logo" class="brand-logo" />
+      <span class="brand-text">HNU — النظام المحاسبي</span>
+    </div>
+  </header>
+
+  <main class="container">
+    <section class="module-card">
+      <h2>قائمة المستخدمين</h2>
+      <div class="filter-row">
+        <input id="q" placeholder="بحث سريع بالاسم أو البريد" />
+        <select id="filter-role">
+          <option value="">كل الأدوار</option>
+          <option>مشرف أعلى</option>
+          <option>مشرف</option>
+          <option>محاسب</option>
+          <option>عارض</option>
+        </select>
+        <select id="filter-status">
+          <option value="">كل الحالات</option>
+          <option value="active">نشط</option>
+          <option value="inactive">غير نشط</option>
+        </select>
+        <button id="btn-new" class="small-btn" onclick="location.href='add-user.html'">➕ إضافة مستخدم</button>
+      </div>
+      <div class="responsive-table">
+        <table id="tbl-users">
+          <thead><tr><th>الاسم</th><th>البريد</th><th>الدور</th><th>تاريخ الإنشاء</th><th>الحالة</th><th>إجراءات</th></tr></thead>
+          <tbody></tbody>
+        </table>
+      </div>
+    </section>
+  </main>
+
+  <script src="admin-modules.js"></script>
+  <script>
+    async function load(){
+      const res = await AdminAPI.apiFetch('/api/users/list');
+      const rows = res.users||[];
+      render(rows);
+      document.getElementById('q').addEventListener('input',()=>filter(rows));
+      document.getElementById('filter-role').addEventListener('change',()=>filter(rows));
+      document.getElementById('filter-status').addEventListener('change',()=>filter(rows));
+    }
+    function render(rows){
+      const tbody = document.querySelector('#tbl-users tbody'); tbody.innerHTML='';
+      rows.forEach(u=>{
+        const tr=document.createElement('tr');
+        tr.innerHTML = `<td>${u.name}</td><td>${u.email}</td><td>${u.role}</td><td>${u.created_at}</td><td>${u.status}</td><td class='table-actions'>
+          <button class='small-btn' onclick="location.href='edit-user.html?id=${u.id}'">تعديل</button>
+          <button class='small-btn' onclick="confirmDelete(${u.id},'${u.name}')">حذف</button>
+          <button class='small-btn' onclick="location.href='permissions.html?id=${u.id}'">صلاحيات</button>
+        </td>`;
+        tbody.appendChild(tr);
+      });
+    }
+    function filter(rows){
+      const q=document.getElementById('q').value.toLowerCase();
+      const role=document.getElementById('filter-role').value;
+      const status=document.getElementById('filter-status').value;
+      const out = rows.filter(u=>{
+        if(role && u.role!==role) return false;
+        if(status && u.status!==status) return false;
+        if(q && !(u.name.toLowerCase().includes(q) || u.email.toLowerCase().includes(q))) return false;
+        return true;
+      });
+      render(out);
+    }
+    async function confirmDelete(id,name){
+      if(!confirm('تأكيد حذف المستخدم: '+name+' ؟')) return;
+      const res = await AdminAPI.apiFetch('/api/users/delete',{method:'POST',body:JSON.stringify({id})});
+      if(res.success){alert('تم الحذف'); load();} else alert(res.error||'حدث خطأ');
+    }
+    load();
+  </script>
+</body>
+</html>
