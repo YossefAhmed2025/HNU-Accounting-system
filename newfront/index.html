@@ -1,11 +1,13 @@
 <!doctype html>
 <html lang="ar" dir="rtl">
+
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1" />
   <title>نظام محاسبي - HNU</title>
   <link rel="stylesheet" href="styles.css" />
 </head>
+
 <body>
   <header class="topbar">
     <div class="brand">
@@ -54,7 +56,12 @@
         <h3>قائمة الحسابات</h3>
         <table id="tbl-accounts">
           <thead>
-            <tr><th>الرقم الكودي</th><th>الاسم</th><th>رصيد أول المدة</th><th>نوع</th></tr>
+            <tr>
+              <th>الرقم الكودي</th>
+              <th>الاسم</th>
+              <th>رصيد أول المدة</th>
+              <th>نوع</th>
+            </tr>
           </thead>
           <tbody></tbody>
         </table>
@@ -93,7 +100,15 @@
       <div id="entries-list" class="card">
         <h3>القيود</h3>
         <table id="tbl-entries">
-          <thead><tr><th>التاريخ</th><th>النوع</th><th>الحساب</th><th>المبلغ</th><th>البيان</th></tr></thead>
+          <thead>
+            <tr>
+              <th>التاريخ</th>
+              <th>النوع</th>
+              <th>الحساب</th>
+              <th>المبلغ</th>
+              <th>البيان</th>
+            </tr>
+          </thead>
           <tbody></tbody>
         </table>
       </div>
@@ -134,10 +149,14 @@
               <th colspan="2">ميزان المراجعة بالأرصدة</th>
             </tr>
             <tr>
-              <th>مدين</th><th>دائن</th>
-              <th>مدين</th><th>دائن</th>
-              <th>مدين</th><th>دائن</th>
-              <th>مدين</th><th>دائن</th>
+              <th>مدين</th>
+              <th>دائن</th>
+              <th>مدين</th>
+              <th>دائن</th>
+              <th>مدين</th>
+              <th>دائن</th>
+              <th>مدين</th>
+              <th>دائن</th>
             </tr>
           </thead>
           <tbody></tbody>
@@ -152,7 +171,7 @@
         <div class="row">
           <label>من عام<br><input type="number" id="from-year" value="2025" /></label>
           <label>إلى عام<br><input type="number" id="to-year" value="2025" /></label>
-          <button id="generate-financial" class="primary">توليد التقرير</button>
+          <button id="generate-financial" class="primary1">توليد التقرير</button>
         </div>
         <table id="tbl-financial">
           <thead>
@@ -190,7 +209,16 @@
         </div>
         <div class="responsive-table">
           <table id="users-tbl">
-            <thead><tr><th>الاسم</th><th>البريد</th><th>الدور</th><th>تاريخ الإنشاء</th><th>الحالة</th><th>إجراءات</th></tr></thead>
+            <thead>
+              <tr>
+                <th>الاسم</th>
+                <th>البريد</th>
+                <th>الدور</th>
+                <th>تاريخ الإنشاء</th>
+                <th>الحالة</th>
+                <th>إجراءات</th>
+              </tr>
+            </thead>
             <tbody></tbody>
           </table>
         </div>
@@ -310,11 +338,27 @@
         <div class="filter-row">
           <label>من<br><input id="j-from" type="date"></label>
           <label>إلى<br><input id="j-to" type="date"></label>
-          <label>نوع<br><select id="j-type"><option value="">كل الأنواع</option><option value="debit">مدين</option><option value="credit">دائن</option></select></label>
+          <label>نوع<br><select id="j-type">
+              <option value="">كل الأنواع</option>
+              <option value="debit">مدين</option>
+              <option value="credit">دائن</option>
+            </select></label>
           <button id="j-refresh" class="small-btn">تصفية</button>
         </div>
         <div class="responsive-table">
-          <table id="j-tbl"><thead><tr><th>رقم القيد</th><th>التاريخ</th><th>البيان</th><th>مدين</th><th>دائن</th><th>عرض</th></tr></thead><tbody></tbody></table>
+          <table id="j-tbl">
+            <thead>
+              <tr>
+                <th>رقم القيد</th>
+                <th>التاريخ</th>
+                <th>البيان</th>
+                <th>مدين</th>
+                <th>دائن</th>
+                <th>عرض</th>
+              </tr>
+            </thead>
+            <tbody></tbody>
+          </table>
         </div>
       </div>
     </section>
@@ -336,9 +380,17 @@
       <div class="module-card">
         <h2>إيرادات الطلاب</h2>
         <div class="filter-row">
-          <select id="sr-year"><option>2024/2025</option></select>
-          <select id="sr-fac"><option value="">كل الكليات</option></select>
-          <select id="sr-status"><option value="">كل الحالات</option><option value="paid">مدفوع</option><option value="due">مستحق</option></select>
+          <select id="sr-year">
+            <option>2024/2025</option>
+          </select>
+          <select id="sr-fac">
+            <option value="">كل الكليات</option>
+          </select>
+          <select id="sr-status">
+            <option value="">كل الحالات</option>
+            <option value="paid">مدفوع</option>
+            <option value="due">مستحق</option>
+          </select>
           <button id="sr-refresh" class="small-btn">عرض</button>
         </div>
         <div id="sr-results"></div>
@@ -379,7 +431,11 @@
         <h2>بحث عن حسابات وقيود</h2>
         <div class="filter-row">
           <input id="s-q" placeholder="رقم الحساب، اسم الحساب، رقم القيد، الوصف" />
-          <select id="s-type"><option value="">الكل</option><option value="account">حساب</option><option value="entry">قيد</option></select>
+          <select id="s-type">
+            <option value="">الكل</option>
+            <option value="account">حساب</option>
+            <option value="entry">قيد</option>
+          </select>
           <label>من<br><input id="s-from" type="date"></label>
           <label>إلى<br><input id="s-to" type="date"></label>
           <button id="s-search" class="small-btn">بحث</button>
@@ -393,11 +449,12 @@
 
   <!-- redirect to standalone login page if not authenticated -->
   <script>
-    try{
-      if(!localStorage.getItem('loggedIn')){
+    try {
+      if (!localStorage.getItem('loggedIn')) {
         window.location.href = 'login.html';
       }
-    }catch(e){/* ignore */}
+    } catch (e) {/* ignore */ }
   </script>
 </body>
+
 </html>
