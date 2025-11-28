@@ -1,59 +1,75 @@
-<!doctype html>
+<!DOCTYPE html>
 <html lang="ar" dir="rtl">
-
-<head>
-  <meta charset="utf-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1" />
-  <title>السنة المالية - النظام المحاسبي</title>
-  <link rel="stylesheet" href="styles.css" />
-</head>
-<!-- صفحة السنة المالية -->
-<body>
-  <header class="topbar">
-    <div class="brand">
-      <img src="logo.png" alt="HNU logo" class="brand-logo" />
-      <span class="brand-text">HNU — النظام المحاسبي</span>
-    </div>
-    <nav class="nav">
-      <a href="index.html" class="nav-link">إضافة حساب</a>
-      <a href="entries.html" class="nav-link">إضافة قيد</a>
-      <a href="ledger.html" class="nav-link">دفتر الأستاذ</a>
-      <a href="trial-balance.html" class="nav-link">ميزان المراجعة</a>
-      <a href="financial-position.html" class="nav-link">قائمة المركز المالي</a>
-      <a href="users.html" class="nav-link">المستخدمين</a>
-      <a href="year-settings.html" class="nav-link active">السنة المالية</a>
-      <a href="journal.html" class="nav-link">دفتر اليومية</a>
-    </nav>
-  </header>
-
-  <main class="container">
-    <!-- إعداد السنة المالية -->
-    <section id="section-financial-year" class="page active">
-      <h2>إعداد السنة المالية</h2>
-      <div class="card">
-        <form id="form-year">
-          <div class="row">
-            <label>السنة المالية<br><input name="year" id="fy-year" type="text" /></label>
-            <label>تاريخ البداية<br><input name="start" id="fy-start" type="date" /></label>
-            <label>تاريخ النهاية<br><input name="end" id="fy-end" type="date" /></label>
-          </div>
-          <button class="primary" id="fy-activate" type="submit">تفعيل السنة</button>
-        </form>
-        <p id="fy-status" style="margin-top:10px"></p>
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>السنة المالية - النظام المحاسبي</title>
+    <link rel="icon" type="image/png" href="logo.png">
+    <link rel="stylesheet" href="styles.css" />
+  </head>
+  <!-- صفحة السنة المالية -->
+  <body>
+    <header class="topbar">
+      <div class="brand">
+        <img src="logo.png" alt="HNU logo" class="brand-logo" />
+        <span class="brand-text">HNU — النظام المحاسبي</span>
       </div>
-    </section>
+      <nav class="nav">
+        <a href="index.html" class="nav-link">إضافة حساب</a>
+        <a href="entries.html" class="nav-link">إضافة قيد</a>
+        <a href="ledger.html" class="nav-link">دفتر الأستاذ</a>
+        <a href="trial-balance.html" class="nav-link">ميزان المراجعة</a>
+        <a href="financial-position.html" class="nav-link"
+          >قائمة المركز المالي</a
+        >
+        <a href="users.html" class="nav-link">المستخدمين</a>
+        <a href="year-settings.html" class="nav-link active">السنة المالية</a>
+        <a href="journal.html" class="nav-link">دفتر اليومية</a>
+      </nav>
+    </header>
 
-    <!-- إقفال السنة -->
-    <section id="section-year-close" class="page">
-      <h2>إقفال السنة وترحيل الأرصدة</h2>
-      <div class="card">
-        <button id="yc-close-accounts" class="primary" type="button">إقفال حسابات الإيرادات والمصروفات</button>
-        <button id="yc-rollover" class="btn-YC-ROLLOVER" type="button">ترحيل الرصيد الافتتاحي</button>
-      </div>
-    </section>
-  </main>
+    <main class="container">
+      <!-- إعداد السنة المالية -->
+      <section id="section-financial-year" class="page active">
+        <h2>إعداد السنة المالية</h2>
+        <div class="card">
+          <form id="form-year">
+            <div class="row">
+              <label
+                >السنة المالية<br /><input name="year" id="fy-year" type="text"
+              /></label>
+              <label
+                >تاريخ البداية<br /><input
+                  name="start"
+                  id="fy-start"
+                  type="date"
+              /></label>
+              <label
+                >تاريخ النهاية<br /><input name="end" id="fy-end" type="date"
+              /></label>
+            </div>
+            <button class="primary" id="fy-activate" type="submit">
+              تفعيل السنة
+            </button>
+          </form>
+          <p id="fy-status" style="margin-top: 10px"></p>
+        </div>
+      </section>
 
-  <script src="main.js"></script>
-</body>
+      <!-- إقفال السنة -->
+      <section id="section-year-close" class="page">
+        <h2>إقفال السنة وترحيل الأرصدة</h2>
+        <div class="card">
+          <button id="yc-close-accounts" class="primary" type="button">
+            إقفال حسابات الإيرادات والمصروفات
+          </button>
+          <button id="yc-rollover" class="btn-YC-ROLLOVER" type="button">
+            ترحيل الرصيد الافتتاحي
+          </button>
+        </div>
+      </section>
+    </main>
 
+    <script src="main.js"></script>
+  </body>
 </html>
