@@ -23,6 +23,113 @@ body {
   color: #e6eef6
 }
 
+.nav-link {
+  display: inline-block;
+  margin-inline-start: 8px;
+  padding: 8px 12px;
+  border-radius: 10px;
+  border: 1px solid rgba(255, 255, 255, 0.03);
+  background: linear-gradient(90deg, #132f4c, #0a1929);
+  color: var(--muted);
+  cursor: pointer;
+  transition: .3s;
+  font-size: 13px;
+  text-decoration: none;
+  white-space: nowrap;
+}
+
+.nav-link:hover {
+  background: linear-gradient(90deg, var(--accent-green), #059669);
+  color: #001;
+}
+
+.nav-link.active {
+  background: linear-gradient(90deg, var(--accent-green), #059669);
+  color: #fff;
+  border-color: rgba(16, 185, 129, 0.7);
+}
+
+
+.btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  padding: var(--space-8) var(--space-16);
+  border-radius: var(--radius-base);
+  font-size: var(--font-size-base);
+  font-weight: 500;
+  line-height: 1.5;
+  cursor: pointer;
+  transition: all var(--duration-normal) var(--ease-standard);
+  border: none;
+  text-decoration: none;
+  position: relative;
+}
+
+.btn:focus-visible {
+  outline: none;
+  box-shadow: var(--focus-ring);
+}
+
+.btn--primary {
+  background: var(--color-primary);
+  color: var(--color-btn-primary-text);
+}
+
+.btn--primary:hover {
+  background: var(--color-primary-hover);
+}
+
+.btn--primary:active {
+  background: var(--color-primary-active);
+}
+
+.btn--secondary {
+  background: var(--color-secondary);
+  color: var(--color-text);
+}
+
+.btn--secondary:hover {
+  background: var(--color-secondary-hover);
+}
+
+.btn--secondary:active {
+  background: var(--color-secondary-active);
+}
+
+.btn--outline {
+  background: transparent;
+  border: 1px solid var(--color-border);
+  color: var(--color-text);
+}
+
+.btn--outline:hover {
+  background: var(--color-secondary);
+}
+
+.btn--sm {
+  padding: var(--space-4) var(--space-12);
+  font-size: var(--font-size-sm);
+  border-radius: var(--radius-sm);
+}
+
+.btn--lg {
+  padding: var(--space-10) var(--space-20);
+  font-size: var(--font-size-lg);
+  border-radius: var(--radius-md);
+}
+
+.btn--full-width {
+  width: 100%;
+}
+
+.btn:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+
+
 .topbar {
   display: flex;
   align-items: center;
@@ -37,37 +144,6 @@ body {
   font-weight: 700;
   color: var(--accent);
   font-size: 16px
-}
-
-.nav .btn {
-  margin-inline-start: 8px;
-  padding: 8px 12px;
-  border-radius: 10px;
-  border: 1px solid rgba(255, 255, 255, 0.03);
-  background: linear-gradient(90deg, #0f2a44, #0b1a26);
-  color: var(--muted);
-  cursor: pointer;
-  transition: .3s
-}
-
-.nav .btn:hover {
-  background: linear-gradient(90deg, var(--accent), var(--accent-2));
-  color: #fff
-}
-
-/* Base button style used across the UI (applies when element has class="btn") */
-.btn {
-  padding: 8px 12px;
-  border-radius: 10px;
-  border: 1px solid rgba(255, 255, 255, 0.03);
-  background: linear-gradient(90deg, #0f2a44, #0b1a26);
-  color: var(--muted);
-  cursor: pointer;
-  transition: .2s
-}
-
-.btn:hover {
-  opacity: .92
 }
 
 .container {
@@ -175,19 +251,6 @@ table th {
   flex: 1 1 200px
 }
 
-.btn.muted {
-  background: #222;
-  color: #888;
-  border: none;
-  border-radius: 6px;
-  cursor: pointer;
-  transition: .2s
-}
-
-.btn.muted:hover {
-  background: #555;
-  color: #fff
-}
 
 /* module-specific styles (merged from modules.css) */
 /* Minimal adjustments for tables/forms used by new modules */
@@ -270,7 +333,7 @@ table th {
   margin-bottom: 10px
 }
 
-/* Watermark background using the HNU logo (place `logo.png` in the same folder) */
+/* Watermark background using the HNU logo */
 body {
   position: relative
 }
