@@ -39,8 +39,8 @@ body {
 }
 
 .nav-link:hover {
-  background: linear-gradient(90deg, var(--accent-green), #059669);
-  color: #001;
+  background: linear-gradient(90deg, var(--accent), var(--accent-2));
+  color: #fff;
 }
 
 .nav-link.active {
@@ -128,6 +128,32 @@ body {
   cursor: not-allowed;
 }
 
+.btn-add-transaction {
+  background: rgba(255, 255, 255, 0.08);
+  backdrop-filter: blur(8px);
+  border: 1px solid rgba(255, 255, 255, 0.18);
+  color: #eaf6fb;
+  padding: 8px 22px;
+  border-radius: 14px;
+  font-size: 15px;
+  font-weight: 600;
+  cursor: pointer;
+  display: inline-flex;
+  align-items: center;
+  gap: 10px;
+  transition: 0.3s ease;
+}
+
+.btn-add-transaction:hover {
+  background: rgba(255, 255, 255, 0.15);
+  transform: translateY(-3px);
+}
+
+.btn-add-transaction:active {
+  transform: scale(0.96);
+  box-shadow: 0 3px 10px rgba(0, 255, 255, 0.18);
+}
+
 
 
 .topbar {
@@ -192,14 +218,18 @@ select {
 }
 
 button.primary {
-  background: linear-gradient(90deg, var(--accent), var(--accent-2));
+  background: linear-gradient(90deg, #06b6d4, #3b82f6);
   color: #fff;
+  padding: 8px 18px;
   border: none;
-  padding: 8px 16px;
-  margin-top: 10px;
-  border-radius: 8px;
+  border-radius: 10px;
   cursor: pointer;
-  transition: .3s
+  font-size: 15px;
+  font-weight: 600;
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  transition: 0.25s ease;
 }
 
 button.primary1 {
@@ -219,8 +249,46 @@ button.primary1:hover {
 }
 
 button.primary:hover {
-  opacity: .85;
-  transform: scale(1.02);
+  transform: translateY(-2px) scale(1.03);
+  box-shadow: 0 6px 18px rgba(6, 182, 212, 0.35);
+  opacity: 0.95;
+}
+
+button.primary-financial{
+  background: linear-gradient(90deg, var(--accent), var(--accent-2));
+  color: #fff;
+  border: none;
+  padding: 10px 8px;
+  margin-top: 20px;
+  border-radius: 8px;
+  cursor: pointer;
+  transition: .3s;
+}
+button.primary-financial:hover {
+  transform: translateY(-2px) scale(1.03);
+  box-shadow: 0 6px 18px rgba(6, 182, 212, 0.35);
+  opacity: 0.95;
+}
+
+button.btn-YC-ROLLOVER{
+  background: rgba(255, 255, 255, 0.08);
+  backdrop-filter: blur(8px);
+  border: 1px solid rgba(255, 255, 255, 0.18);
+  color: #eaf6fb;
+  padding: 8px 22px;
+  border-radius: 14px;
+  font-size: 15px;
+  font-weight: 600;
+  cursor: pointer;
+  display: inline-flex;
+  align-items: center;
+  gap: 10px;
+  transition: 0.3s ease;
+}
+
+button.btn-YC-ROLLOVER:hover {
+  background: rgba(255, 255, 255, 0.15);
+  transform: translateY(-3px);
 }
 
 table {
