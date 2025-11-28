@@ -1,0 +1,54 @@
+<!doctype html>
+<html lang="ar" dir="rtl">
+
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>دفتر الأستاذ - النظام المحاسبي</title>
+  <link rel="stylesheet" href="styles.css" />
+</head>
+    <!-- صفحة دفتر الأستاذ -->
+<body>
+  <header class="topbar">
+    <div class="brand">
+      <img src="logo.png" alt="HNU logo" class="brand-logo" />
+      <span class="brand-text">HNU — النظام المحاسبي</span>
+    </div>
+    <nav class="nav">
+      <a href="index.html" class="nav-link">إضافة حساب</a>
+      <a href="entries.html" class="nav-link">إضافة قيد</a>
+      <a href="ledger.html" class="nav-link active">دفتر الأستاذ</a>
+      <a href="trial-balance.html" class="nav-link">ميزان المراجعة</a>
+      <a href="financial-position.html" class="nav-link">قائمة المركز المالي</a>
+      <a href="users.html" class="nav-link">المستخدمين</a>
+      <a href="year-settings.html" class="nav-link">السنة المالية</a>
+      <a href="journal.html" class="nav-link">دفتر اليومية</a>
+    </nav>
+  </header>
+
+  <main class="container">
+    <section id="section-ledger" class="page active">
+      <h2>دفتر الأستاذ</h2>
+      <div class="card">
+        <table id="tbl-ledger">
+          <thead>
+            <tr>
+              <th>الرقم الكودي</th>
+              <th>اسم الحساب</th>
+              <th>رصيد أول المدة</th>
+              <th>مدين</th>
+              <th>دائن</th>
+              <th>الرصيد النهائي</th>
+              <th>نوع</th>
+            </tr>
+          </thead>
+          <tbody></tbody>
+        </table>
+      </div>
+    </section>
+  </main>
+
+  <script src="main.js"></script>
+</body>
+
+</html>

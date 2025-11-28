@@ -1,0 +1,56 @@
+<!doctype html>
+<html lang="ar" dir="rtl">
+
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>قائمة المركز المالي - النظام المحاسبي</title>
+  <link rel="stylesheet" href="styles.css" />
+</head>
+    <!-- صفحة قائمة المركز المالي -->
+<body>
+  <header class="topbar">
+    <div class="brand">
+      <img src="logo.png" alt="HNU logo" class="brand-logo" />
+      <span class="brand-text">HNU — النظام المحاسبي</span>
+    </div>
+    <nav class="nav">
+      <a href="index.html" class="nav-link">إضافة حساب</a>
+      <a href="entries.html" class="nav-link">إضافة قيد</a>
+      <a href="ledger.html" class="nav-link">دفتر الأستاذ</a>
+      <a href="trial-balance.html" class="nav-link">ميزان المراجعة</a>
+      <a href="financial-position.html" class="nav-link active">قائمة المركز المالي</a>
+      <a href="users.html" class="nav-link">المستخدمين</a>
+      <a href="year-settings.html" class="nav-link">السنة المالية</a>
+      <a href="journal.html" class="nav-link">دفتر اليومية</a>
+    </nav>
+  </header>
+
+  <main class="container">
+    <section id="section-financial" class="page active">
+      <h2>قائمة المركز المالي</h2>
+      <div class="card">
+        <div class="row">
+          <label>من عام<br><input type="number" id="from-year" value="2025" /></label>
+          <label>إلى عام<br><input type="number" id="to-year" value="2025" /></label>
+          <button id="generate-financial" class="primary" type="button">توليد التقرير</button>
+        </div>
+        <table id="tbl-financial">
+          <thead>
+            <tr>
+              <th>الأصول طويل الأجل</th>
+              <th>رقم الإيضاح</th>
+              <th>من عام</th>
+              <th>إلى عام</th>
+            </tr>
+          </thead>
+          <tbody></tbody>
+        </table>
+      </div>
+    </section>
+  </main>
+
+  <script src="main.js"></script>
+</body>
+
+</html>

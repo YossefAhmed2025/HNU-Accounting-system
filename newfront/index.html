@@ -4,10 +4,10 @@
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1" />
-  <title>نظام محاسبي - HNU</title>
+  <title>إضافة حساب جديد - النظام المحاسبي</title>
   <link rel="stylesheet" href="styles.css" />
 </head>
-
+    <!-- صفحة الحسابات -->
 <body>
   <header class="topbar">
     <div class="brand">
@@ -15,25 +15,19 @@
       <span class="brand-text">HNU — النظام المحاسبي</span>
     </div>
     <nav class="nav">
-      <button id="nav-accounts" class="btn">إضافة حساب</button>
-      <button id="nav-entry" class="btn">إضافة قيد</button>
-      <button id="nav-ledger" class="btn">دفتر الأستاذ</button>
-      <button id="nav-trial" class="btn">ميزان المراجعة</button>
-      <button id="nav-financial" class="btn">قائمة المركز المالي</button>
-      <!-- Modules integration buttons -->
-      <button id="nav-users" class="btn">إدارة المستخدمين</button>
-      <button id="nav-finyear" class="btn">السنة المالية</button>
-      <button id="nav-yearclose" class="btn">إقفال السنة</button>
-      <button id="nav-journal" class="btn">دفتر اليومية</button>
-      <button id="nav-reports" class="btn">تقارير</button>
-      <button id="nav-search" class="btn">بحث</button>
-      <button id="btn-logout" class="btn" style="display:none">تسجيل خروج</button>
+      <a href="index.html" class="nav-link active">إضافة حساب</a>
+      <a href="entries.html" class="nav-link">إضافة قيد</a>
+      <a href="ledger.html" class="nav-link">دفتر الأستاذ</a>
+      <a href="trial-balance.html" class="nav-link">ميزان المراجعة</a>
+      <a href="financial-position.html" class="nav-link">قائمة المركز المالي</a>
+      <a href="users.html" class="nav-link">المستخدمين</a>
+      <a href="year-settings.html" class="nav-link">السنة المالية</a>
+      <a href="journal.html" class="nav-link">دفتر اليومية</a>
     </nav>
   </header>
 
   <main class="container">
-    <!-- صفحة الحسابات -->
-    <section id="section-accounts" class="page">
+    <section id="section-accounts" class="page active">
       <h2>إضافة حساب جديد</h2>
       <form id="form-account" class="card">
         <div class="row">
@@ -43,9 +37,10 @@
         <div class="row">
           <label>رصيد أول المدة<br><input name="opening_balance" type="number" step="0.01" value="0" required /></label>
           <label>نوع الرصيد<br>
-            <select name="balance_type">
-              <option value="debit">مدين</option>
-              <option value="credit">دائن</option>
+            <select name="balance_type" required>
+              <option value="">-- اختر --</option>
+              <option value="مدين">مدين</option>
+              <option value="دائن">دائن</option>
             </select>
           </label>
         </div>
@@ -60,401 +55,17 @@
               <th>الرقم الكودي</th>
               <th>الاسم</th>
               <th>رصيد أول المدة</th>
-              <th>نوع</th>
-            </tr>
-          </thead>
-          <tbody></tbody>
-        </table>
-      </div>
-    </section>
-
-    <!-- صفحة القيود -->
-    <section id="section-entry" class="page" style="display:none;">
-      <h2>إضافة قيد يومي</h2>
-      <form id="form-entry" class="card">
-        <div class="row">
-          <label>التاريخ<br><input name="entry_date" type="date" required /></label>
-          <label>البيان<br><input name="description" /></label>
-        </div>
-        <div id="transactions-container">
-          <div class="transaction row">
-            <label>نوع العملية<br>
-              <select class="type">
-                <option value="debit">مدين</option>
-                <option value="credit">دائن</option>
-              </select>
-            </label>
-            <label>الحساب<br>
-              <select class="account" required></select>
-            </label>
-            <label>المبلغ<br>
-              <input class="amount" type="number" step="0.01" required />
-            </label>
-            <button type="button" class="remove-transaction btn muted">✖</button>
-          </div>
-        </div>
-        <button type="button" id="add-transaction" class="btn">➕ إضافة عملية جديدة</button>
-        <button type="submit" class="primary">💾 حفظ القيد</button>
-      </form>
-
-      <div id="entries-list" class="card">
-        <h3>القيود</h3>
-        <table id="tbl-entries">
-          <thead>
-            <tr>
-              <th>التاريخ</th>
               <th>النوع</th>
-              <th>الحساب</th>
-              <th>المبلغ</th>
-              <th>البيان</th>
+              <th>إجراءات</th>
             </tr>
           </thead>
           <tbody></tbody>
         </table>
-      </div>
-    </section>
-
-    <!-- دفتر الأستاذ -->
-    <section id="section-ledger" class="page" style="display:none;">
-      <h2>دفتر الأستاذ</h2>
-      <div class="card">
-        <table id="tbl-ledger">
-          <thead>
-            <tr>
-              <th>الرقم الكودي</th>
-              <th>اسم الحساب</th>
-              <th>رصيد أول المدة</th>
-              <th>مدين</th>
-              <th>دائن</th>
-              <th>الرصيد النهائي</th>
-              <th>نوع</th>
-            </tr>
-          </thead>
-          <tbody></tbody>
-        </table>
-      </div>
-    </section>
-
-    <!-- ميزان المراجعة -->
-    <section id="section-trial" class="page" style="display:none;">
-      <h2>ميزان المراجعة</h2>
-      <div class="card">
-        <table id="tbl-trial">
-          <thead>
-            <tr>
-              <th rowspan="2">الحساب</th>
-              <th colspan="2">رصيد أول المدة</th>
-              <th colspan="2">الحركة خلال العام</th>
-              <th colspan="2">ميزان المراجعة بالمجاميع</th>
-              <th colspan="2">ميزان المراجعة بالأرصدة</th>
-            </tr>
-            <tr>
-              <th>مدين</th>
-              <th>دائن</th>
-              <th>مدين</th>
-              <th>دائن</th>
-              <th>مدين</th>
-              <th>دائن</th>
-              <th>مدين</th>
-              <th>دائن</th>
-            </tr>
-          </thead>
-          <tbody></tbody>
-        </table>
-      </div>
-    </section>
-
-    <!-- قائمة المركز المالي -->
-    <section id="section-financial" class="page" style="display:none;">
-      <h2>قائمة المركز المالي</h2>
-      <div class="card">
-        <div class="row">
-          <label>من عام<br><input type="number" id="from-year" value="2025" /></label>
-          <label>إلى عام<br><input type="number" id="to-year" value="2025" /></label>
-          <button id="generate-financial" class="primary1">توليد التقرير</button>
-        </div>
-        <table id="tbl-financial">
-          <thead>
-            <tr>
-              <th>الأصول طويل الأجل</th>
-              <th>رقم الإيضاح</th>
-              <th>من عام</th>
-              <th>إلى عام</th>
-            </tr>
-          </thead>
-          <tbody></tbody>
-        </table>
-      </div>
-    </section>
-
-    <!-- إدارة المستخدمين: قائمة -->
-    <section id="section-users-list" class="page" style="display:none;">
-      <div class="module-card">
-        <h2>قائمة المستخدمين</h2>
-        <div class="filter-row">
-          <input id="users-q" placeholder="بحث سريع بالاسم أو البريد" />
-          <select id="users-filter-role">
-            <option value="">كل الأدوار</option>
-            <option>مشرف أعلى</option>
-            <option>مشرف</option>
-            <option>محاسب</option>
-            <option>عارض</option>
-          </select>
-          <select id="users-filter-status">
-            <option value="">كل الحالات</option>
-            <option value="active">نشط</option>
-            <option value="inactive">غير نشط</option>
-          </select>
-          <button id="users-btn-new" class="small-btn">➕ إضافة مستخدم</button>
-        </div>
-        <div class="responsive-table">
-          <table id="users-tbl">
-            <thead>
-              <tr>
-                <th>الاسم</th>
-                <th>البريد</th>
-                <th>الدور</th>
-                <th>تاريخ الإنشاء</th>
-                <th>الحالة</th>
-                <th>إجراءات</th>
-              </tr>
-            </thead>
-            <tbody></tbody>
-          </table>
-        </div>
-      </div>
-    </section>
-
-    <!-- إضافة مستخدم -->
-    <section id="section-add-user" class="page" style="display:none;">
-      <div class="module-card">
-        <h2>إضافة مستخدم جديد</h2>
-        <form id="form-add-user">
-          <div class="row">
-            <label>الاسم الكامل<br><input name="name" required></label>
-            <label>البريد الإلكتروني<br><input name="email" type="email" required></label>
-          </div>
-          <div class="row">
-            <label>كلمة المرور<br><input name="password" type="password" required></label>
-            <label>تأكيد كلمة المرور<br><input name="password2" type="password" required></label>
-          </div>
-          <div class="row">
-            <label>الدور<br>
-              <select name="role">
-                <option>مشرف</option>
-                <option>محاسب</option>
-                <option>عارض</option>
-                <option>مشرف أعلى</option>
-              </select>
-            </label>
-          </div>
-          <button class="primary">حفظ المستخدم</button>
-        </form>
-      </div>
-    </section>
-
-    <!-- تعديل مستخدم -->
-    <section id="section-edit-user" class="page" style="display:none;">
-      <div class="module-card">
-        <h2>تعديل المستخدم</h2>
-        <form id="form-edit-user">
-          <input type="hidden" name="id" id="edit-uid">
-          <div class="row">
-            <label>الاسم الكامل<br><input name="name" id="edit-name" required></label>
-            <label>البريد الإلكتروني<br><input name="email" id="edit-email" type="email" required></label>
-          </div>
-          <div class="row">
-            <label>كلمة المرور (اختياري)<br><input name="password" type="password"></label>
-            <label>تأكيد كلمة المرور<br><input name="password2" type="password"></label>
-          </div>
-          <div class="row">
-            <label>الدور<br>
-              <select name="role" id="edit-role">
-                <option>مشرف</option>
-                <option>محاسب</option>
-                <option>عارض</option>
-                <option>مشرف أعلى</option>
-              </select>
-            </label>
-          </div>
-          <button class="primary">حفظ التغييرات</button>
-        </form>
-      </div>
-    </section>
-
-    <!-- صلاحيات -->
-    <section id="section-permissions" class="page" style="display:none;">
-      <div class="module-card">
-        <h2>صلاحيات المستخدم</h2>
-        <form id="form-permissions">
-          <input type="hidden" id="perm-uid" name="id">
-          <div>
-            <label><input type="checkbox" name="perm_add_entry"> إضافة قيد</label><br>
-            <label><input type="checkbox" name="perm_post"> ترحيل</label><br>
-            <label><input type="checkbox" name="perm_reports"> عرض تقارير</label><br>
-            <label><input type="checkbox" name="perm_close_year"> إقفال السنة</label>
-          </div>
-          <div style="margin-top:10px">
-            <button class="primary">حفظ الصلاحيات</button>
-          </div>
-        </form>
-      </div>
-    </section>
-
-    <!-- السنة المالية -->
-    <section id="section-financial-year" class="page" style="display:none;">
-      <div class="module-card">
-        <h2>إعداد السنة المالية</h2>
-        <form id="form-year">
-          <label>السنة المالية (مثال: 2024/2025)<br><input name="year" id="fy-year"></label>
-          <label>تاريخ البداية<br><input name="start" id="fy-start" type="date"></label>
-          <label>تاريخ النهاية<br><input name="end" id="fy-end" type="date"></label>
-          <div style="margin-top:10px">
-            <button class="primary" id="fy-activate">تفعيل / تحديث السنة</button>
-            <button id="fy-close" class="muted-btn" type="button">إغلاق السنة</button>
-          </div>
-          <p id="fy-status" style="margin-top:10px"></p>
-        </form>
-      </div>
-    </section>
-
-    <!-- إقفال السنة -->
-    <section id="section-year-close" class="page" style="display:none;">
-      <div class="module-card">
-        <h2>إقفال السنة وترحيل الأرصدة</h2>
-        <div id="yc-summary"></div>
-        <div style="margin-top:12px">
-          <button id="yc-close-accounts" class="primary">إقفال حسابات الإيرادات والمصروفات</button>
-          <button id="yc-rollover" class="muted-btn">ترحيل الرصيد الافتتاحي للسنة الجديدة</button>
-        </div>
-        <div id="yc-audit-log" style="margin-top:16px"></div>
-      </div>
-    </section>
-
-    <!-- دفتر اليومية -->
-    <section id="section-journal" class="page" style="display:none;">
-      <div class="module-card">
-        <h2>دفتر اليومية</h2>
-        <div class="filter-row">
-          <label>من<br><input id="j-from" type="date"></label>
-          <label>إلى<br><input id="j-to" type="date"></label>
-          <label>نوع<br><select id="j-type">
-              <option value="">كل الأنواع</option>
-              <option value="debit">مدين</option>
-              <option value="credit">دائن</option>
-            </select></label>
-          <button id="j-refresh" class="small-btn">تصفية</button>
-        </div>
-        <div class="responsive-table">
-          <table id="j-tbl">
-            <thead>
-              <tr>
-                <th>رقم القيد</th>
-                <th>التاريخ</th>
-                <th>البيان</th>
-                <th>مدين</th>
-                <th>دائن</th>
-                <th>عرض</th>
-              </tr>
-            </thead>
-            <tbody></tbody>
-          </table>
-        </div>
-      </div>
-    </section>
-
-    <!-- مصروفات حسب الكلية -->
-    <section id="section-expenses-faculty" class="page" style="display:none;">
-      <div class="module-card">
-        <h2>مصروفات حسب الكلية</h2>
-        <div class="filter-row">
-          <select id="ef-faculty"></select>
-          <button id="ef-view" class="small-btn">عرض</button>
-        </div>
-        <div id="ef-summary"></div>
-      </div>
-    </section>
-
-    <!-- إيرادات الطلاب -->
-    <section id="section-student-revenue" class="page" style="display:none;">
-      <div class="module-card">
-        <h2>إيرادات الطلاب</h2>
-        <div class="filter-row">
-          <select id="sr-year">
-            <option>2024/2025</option>
-          </select>
-          <select id="sr-fac">
-            <option value="">كل الكليات</option>
-          </select>
-          <select id="sr-status">
-            <option value="">كل الحالات</option>
-            <option value="paid">مدفوع</option>
-            <option value="due">مستحق</option>
-          </select>
-          <button id="sr-refresh" class="small-btn">عرض</button>
-        </div>
-        <div id="sr-results"></div>
-      </div>
-    </section>
-
-    <!-- تقرير حساب -->
-    <section id="section-account-report" class="page" style="display:none;">
-      <div class="module-card">
-        <h2>تقرير حساب محدد</h2>
-        <div class="filter-row">
-          <select id="ar-account"></select>
-          <label>من<br><input id="ar-from" type="date"></label>
-          <label>إلى<br><input id="ar-to" type="date"></label>
-          <button id="ar-view" class="small-btn">عرض</button>
-        </div>
-        <div id="ar-report"></div>
-      </div>
-    </section>
-
-    <!-- حركة حساب -->
-    <section id="section-account-movements" class="page" style="display:none;">
-      <div class="module-card">
-        <h2>حركة على حساب</h2>
-        <div class="filter-row">
-          <select id="am-account"></select>
-          <label>من<br><input id="am-from" type="date"></label>
-          <label>إلى<br><input id="am-to" type="date"></label>
-          <button id="am-view" class="small-btn">عرض</button>
-        </div>
-        <div id="am-movements"></div>
-      </div>
-    </section>
-
-    <!-- بحث -->
-    <section id="section-search" class="page" style="display:none;">
-      <div class="module-card">
-        <h2>بحث عن حسابات وقيود</h2>
-        <div class="filter-row">
-          <input id="s-q" placeholder="رقم الحساب، اسم الحساب، رقم القيد، الوصف" />
-          <select id="s-type">
-            <option value="">الكل</option>
-            <option value="account">حساب</option>
-            <option value="entry">قيد</option>
-          </select>
-          <label>من<br><input id="s-from" type="date"></label>
-          <label>إلى<br><input id="s-to" type="date"></label>
-          <button id="s-search" class="small-btn">بحث</button>
-        </div>
-        <div id="s-results"></div>
       </div>
     </section>
   </main>
 
   <script src="main.js"></script>
-
-  <!-- redirect to standalone login page if not authenticated -->
-  <script>
-    try {
-      if (!localStorage.getItem('loggedIn')) {
-        window.location.href = 'login.html';
-      }
-    } catch (e) {/* ignore */ }
-  </script>
 </body>
 
 </html>
