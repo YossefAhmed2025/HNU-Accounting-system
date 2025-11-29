@@ -1,71 +1,83 @@
-<!doctype html>
+<!DOCTYPE html>
 <html lang="ar" dir="rtl">
-
-<head>
-  <meta charset="utf-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1" />
-  <title>إضافة حساب جديد - النظام المحاسبي</title>
-  <link rel="stylesheet" href="styles.css" />
-</head>
-    <!-- صفحة الحسابات -->
-<body>
-  <header class="topbar">
-    <div class="brand">
-      <img src="logo.png" alt="HNU logo" class="brand-logo" />
-      <span class="brand-text">HNU — النظام المحاسبي</span>
-    </div>
-    <nav class="nav">
-      <a href="index.html" class="nav-link active">إضافة حساب</a>
-      <a href="entries.html" class="nav-link">إضافة قيد</a>
-      <a href="ledger.html" class="nav-link">دفتر الأستاذ</a>
-      <a href="trial-balance.html" class="nav-link">ميزان المراجعة</a>
-      <a href="financial-position.html" class="nav-link">قائمة المركز المالي</a>
-      <a href="users.html" class="nav-link">المستخدمين</a>
-      <a href="year-settings.html" class="nav-link">السنة المالية</a>
-      <a href="journal.html" class="nav-link">دفتر اليومية</a>
-    </nav>
-  </header>
-
-  <main class="container">
-    <section id="section-accounts" class="page active">
-      <h2>إضافة حساب جديد</h2>
-      <form id="form-account" class="card">
-        <div class="row">
-          <label>رقم الحساب<br><input name="code" type="text" required /></label>
-          <label>اسم الحساب<br><input name="name" required /></label>
-        </div>
-        <div class="row">
-          <label>رصيد أول المدة<br><input name="opening_balance" type="number" step="0.01" value="0" required /></label>
-          <label>نوع الرصيد<br>
-            <select name="balance_type" required>
-              <option value="">-- اختر --</option>
-              <option value="مدين">مدين</option>
-              <option value="دائن">دائن</option>
-            </select>
-          </label>
-        </div>
-        <button type="submit" class="primary">💾 حفظ الحساب</button>
-      </form>
-
-      <div id="accounts-list" class="card">
-        <h3>قائمة الحسابات</h3>
-        <table id="tbl-accounts">
-          <thead>
-            <tr>
-              <th>الرقم الكودي</th>
-              <th>الاسم</th>
-              <th>رصيد أول المدة</th>
-              <th>النوع</th>
-              <th>إجراءات</th>
-            </tr>
-          </thead>
-          <tbody></tbody>
-        </table>
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>إضافة حساب جديد - النظام المحاسبي</title>
+    <link rel="icon" type="image/png" href="logo.png" />
+    <link rel="stylesheet" href="styles.css" />
+  </head>
+  <!-- صفحة الحسابات -->
+  <body>
+    <header class="topbar">
+      <div class="brand">
+        <img src="logo.png" alt="HNU logo" class="brand-logo" />
+        <span class="brand-text">HNU — النظام المحاسبي</span>
       </div>
-    </section>
-  </main>
+      <nav class="nav">
+        <a href="index.html" class="nav-link active">إضافة حساب</a>
+        <a href="entries.html" class="nav-link">إضافة قيد</a>
+        <a href="ledger.html" class="nav-link">دفتر الأستاذ</a>
+        <a href="trial-balance.html" class="nav-link">ميزان المراجعة</a>
+        <a href="financial-position.html" class="nav-link"
+          >قائمة المركز المالي</a
+        >
+        <a href="users.html" class="nav-link">المستخدمين</a>
+        <a href="year-settings.html" class="nav-link">السنة المالية</a>
+        <a href="journal.html" class="nav-link">دفتر اليومية</a>
+      </nav>
+    </header>
 
-  <script src="main.js"></script>
-</body>
+    <main class="container">
+      <section id="section-accounts" class="page active">
+        <h2>إضافة حساب جديد</h2>
+        <form id="form-account" class="card">
+          <div class="row">
+            <label
+              >رقم الحساب<br /><input name="code" type="text" required
+            /></label>
+            <label>اسم الحساب<br /><input name="name" required /></label>
+          </div>
+          <div class="row">
+            <label
+              >رصيد أول المدة<br /><input
+                name="opening_balance"
+                type="number"
+                step="0.01"
+                value="0"
+                required
+            /></label>
+            <label
+              >نوع الرصيد<br />
+              <select name="balance_type" required>
+                <option value="">-- اختر --</option>
+                <option value="مدين">مدين</option>
+                <option value="دائن">دائن</option>
+              </select>
+            </label>
+          </div>
+          <button type="submit" class="primary">💾 حفظ الحساب</button>
+        </form>
 
+        <div id="accounts-list" class="card">
+          <h3>قائمة الحسابات</h3>
+          <table id="tbl-accounts">
+            <thead>
+              <tr>
+                <th>الرقم الكودي</th>
+                <th>الاسم</th>
+                <th>رصيد أول المدة</th>
+                <th>النوع</th>
+                <th>إجراءات</th>
+              </tr>
+            </thead>
+            <tbody></tbody>
+          </table>
+        </div>
+      </section>
+    </main>
+
+    <script src="main.js"></script>
+
+  </body>
 </html>

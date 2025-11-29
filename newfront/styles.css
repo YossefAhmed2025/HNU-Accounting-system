@@ -11,7 +11,7 @@
 
 * {
   box-sizing: border-box;
-  font-family: Inter, 'Segoe UI', Tahoma, 'Noto Naskh Arabic', sans-serif
+  font-family: Inter, "Segoe UI", Tahoma, "Noto Naskh Arabic", sans-serif;
 }
 
 html,
@@ -20,7 +20,7 @@ body {
   margin: 0;
   padding: 0;
   background: linear-gradient(180deg, #071227 0%, #0b1a26 100%);
-  color: #e6eef6
+  color: #e6eef6;
 }
 
 .nav-link {
@@ -32,15 +32,15 @@ body {
   background: linear-gradient(90deg, #132f4c, #0a1929);
   color: var(--muted);
   cursor: pointer;
-  transition: .3s;
+  transition: 0.3s;
   font-size: 13px;
   text-decoration: none;
   white-space: nowrap;
 }
 
 .nav-link:hover {
-  background: linear-gradient(90deg, var(--accent-green), #059669);
-  color: #001;
+  background: linear-gradient(90deg, var(--accent), var(--accent-2));
+  color: #fff;
 }
 
 .nav-link.active {
@@ -48,7 +48,6 @@ body {
   color: #fff;
   border-color: rgba(16, 185, 129, 0.7);
 }
-
 
 .btn {
   display: inline-flex;
@@ -128,7 +127,31 @@ body {
   cursor: not-allowed;
 }
 
+.btn-add-transaction {
+  background: rgba(255, 255, 255, 0.08);
+  backdrop-filter: blur(8px);
+  border: 1px solid rgba(255, 255, 255, 0.18);
+  color: #eaf6fb;
+  padding: 8px 22px;
+  border-radius: 14px;
+  font-size: 15px;
+  font-weight: 600;
+  cursor: pointer;
+  display: inline-flex;
+  align-items: center;
+  gap: 10px;
+  transition: 0.3s ease;
+}
 
+.btn-add-transaction:hover {
+  background: rgba(255, 255, 255, 0.15);
+  transform: translateY(-3px);
+}
+
+.btn-add-transaction:active {
+  transform: scale(0.96);
+  box-shadow: 0 3px 10px rgba(0, 255, 255, 0.18);
+}
 
 .topbar {
   display: flex;
@@ -136,14 +159,18 @@ body {
   justify-content: space-between;
   padding: 14px 20px;
   backdrop-filter: blur(6px);
-  background: linear-gradient(90deg, rgba(255, 255, 255, 0.02), rgba(255, 255, 255, 0.01));
-  box-shadow: 0 6px 24px rgba(2, 6, 23, 0.6)
+  background: linear-gradient(
+    90deg,
+    rgba(255, 255, 255, 0.02),
+    rgba(255, 255, 255, 0.01)
+  );
+  box-shadow: 0 6px 24px rgba(2, 6, 23, 0.6);
 }
 
 .brand {
   font-weight: 700;
   color: var(--accent);
-  font-size: 16px
+  font-size: 16px;
 }
 
 .container {
@@ -152,32 +179,36 @@ body {
   padding: 0 16px;
   display: grid;
   grid-template-columns: 1fr;
-  gap: 18px
+  gap: 18px;
 }
 
 .page {
   background: transparent;
-  padding: 0
+  padding: 0;
 }
 
 .card {
-  background: linear-gradient(180deg, rgba(255, 255, 255, 0.02), rgba(255, 255, 255, 0.01));
+  background: linear-gradient(
+    180deg,
+    rgba(255, 255, 255, 0.02),
+    rgba(255, 255, 255, 0.01)
+  );
   padding: 14px;
   border-radius: var(--radius);
   box-shadow: 0 8px 30px rgba(2, 6, 23, 0.6);
-  border: 1px solid rgba(255, 255, 255, 0.03)
+  border: 1px solid rgba(255, 255, 255, 0.03);
 }
 
 h2 {
   margin: 0 0 12px 0;
-  color: var(--accent)
+  color: var(--accent);
 }
 
 label {
   display: block;
   margin-bottom: 10px;
   color: var(--muted);
-  font-size: 14px
+  font-size: 14px;
 }
 
 input,
@@ -188,18 +219,22 @@ select {
   background: #0b2a44;
   color: #fff;
   width: 100%;
-  margin-top: 4px
+  margin-top: 4px;
 }
 
 button.primary {
-  background: linear-gradient(90deg, var(--accent), var(--accent-2));
+  background: linear-gradient(90deg, #06b6d4, #3b82f6);
   color: #fff;
+  padding: 8px 18px;
   border: none;
-  padding: 8px 16px;
-  margin-top: 10px;
-  border-radius: 8px;
+  border-radius: 10px;
   cursor: pointer;
-  transition: .3s
+  font-size: 15px;
+  font-weight: 600;
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  transition: 0.25s ease;
 }
 
 button.primary1 {
@@ -210,17 +245,55 @@ button.primary1 {
   margin-top: 20px;
   border-radius: 8px;
   cursor: pointer;
-  transition: .3s;
+  transition: 0.3s;
 }
 
 button.primary1:hover {
-  opacity: .65;
+  opacity: 0.65;
   transform: scale(1.02);
 }
 
 button.primary:hover {
-  opacity: .85;
-  transform: scale(1.02);
+  transform: translateY(-2px) scale(1.03);
+  box-shadow: 0 6px 18px rgba(6, 182, 212, 0.35);
+  opacity: 0.95;
+}
+
+button.primary-financial {
+  background: linear-gradient(90deg, var(--accent), var(--accent-2));
+  color: #fff;
+  border: none;
+  padding: 10px 8px;
+  margin-top: 20px;
+  border-radius: 8px;
+  cursor: pointer;
+  transition: 0.3s;
+}
+button.primary-financial:hover {
+  transform: translateY(-2px) scale(1.03);
+  box-shadow: 0 6px 18px rgba(6, 182, 212, 0.35);
+  opacity: 0.95;
+}
+
+button.btn-YC-ROLLOVER {
+  background: rgba(255, 255, 255, 0.08);
+  backdrop-filter: blur(8px);
+  border: 1px solid rgba(255, 255, 255, 0.18);
+  color: #eaf6fb;
+  padding: 8px 22px;
+  border-radius: 14px;
+  font-size: 15px;
+  font-weight: 600;
+  cursor: pointer;
+  display: inline-flex;
+  align-items: center;
+  gap: 10px;
+  transition: 0.3s ease;
+}
+
+button.btn-YC-ROLLOVER:hover {
+  background: rgba(255, 255, 255, 0.15);
+  transform: translateY(-3px);
 }
 
 table {
@@ -238,43 +311,46 @@ table td {
 
 table th {
   background: rgba(6, 182, 212, 0.2);
-  color: #fff
+  color: #fff;
 }
 
 .row {
   display: flex;
   gap: 12px;
-  flex-wrap: wrap
+  flex-wrap: wrap;
 }
 
 .row label {
-  flex: 1 1 200px
+  flex: 1 1 200px;
 }
-
 
 /* module-specific styles (merged from modules.css) */
 /* Minimal adjustments for tables/forms used by new modules */
 
 .module-card {
-  background: linear-gradient(180deg, rgba(255, 255, 255, 0.02), rgba(255, 255, 255, 0.01));
+  background: linear-gradient(
+    180deg,
+    rgba(255, 255, 255, 0.02),
+    rgba(255, 255, 255, 0.01)
+  );
   padding: 14px;
   border-radius: 12px;
   border: 1px solid rgba(255, 255, 255, 0.03);
   box-shadow: 0 8px 30px rgba(2, 6, 23, 0.6);
-  margin-bottom: 16px
+  margin-bottom: 16px;
 }
 
 .table-actions {
   display: flex;
   gap: 8px;
-  justify-content: center
+  justify-content: center;
 }
 
 .filter-row {
   display: flex;
   gap: 12px;
   flex-wrap: wrap;
-  margin-bottom: 10px
+  margin-bottom: 10px;
 }
 
 .small-btn {
@@ -284,11 +360,11 @@ table th {
   cursor: pointer;
   margin-top: 22px;
   margin-bottom: auto;
-  transition: .3s;
+  transition: 0.3s;
 }
 
 .small-btn :hover {
-  opacity: .85;
+  opacity: 0.85;
   transform: scale(1.02);
 }
 
@@ -300,7 +376,7 @@ table th {
 }
 
 .responsive-table {
-  overflow: auto
+  overflow: auto;
 }
 
 .modal {
@@ -310,17 +386,21 @@ table th {
   display: flex;
   align-items: center;
   justify-content: center;
-  z-index: 9999
+  z-index: 9999;
 }
 
 .modal .box {
-  background: linear-gradient(180deg, rgba(6, 30, 50, 0.95), rgba(6, 30, 50, 0.9));
+  background: linear-gradient(
+    180deg,
+    rgba(6, 30, 50, 0.95),
+    rgba(6, 30, 50, 0.9)
+  );
   padding: 20px;
   border-radius: 10px;
   max-width: 520px;
   width: 100%;
   color: #eaf6fb;
-  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.6)
+  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.6);
 }
 
 .modal .box input {
@@ -330,12 +410,12 @@ table th {
   border: 1px solid rgba(255, 255, 255, 0.06);
   background: rgba(255, 255, 255, 0.02);
   color: #fff;
-  margin-bottom: 10px
+  margin-bottom: 10px;
 }
 
 /* Watermark background using the HNU logo */
 body {
-  position: relative
+  position: relative;
 }
 
 body::before {
@@ -343,7 +423,7 @@ body::before {
   position: fixed;
   inset: 0;
   display: block;
-  background-image: url('logo.png');
+  background-image: url("logo.png");
   background-repeat: no-repeat;
   background-position: center center;
   background-size: 70vmin;
@@ -362,7 +442,7 @@ body::before {
 header,
 main {
   position: relative;
-  z-index: 1
+  z-index: 1;
 }
 
 /* Brand / header logo */
@@ -372,16 +452,16 @@ main {
   gap: 12px;
   font-weight: 700;
   color: var(--accent);
-  font-size: 16px
+  font-size: 16px;
 }
 
 .brand-logo {
   width: 44px;
   height: auto;
   border-radius: 6px;
-  display: inline-block
+  display: inline-block;
 }
 
 .brand-text {
-  line-height: 1
+  line-height: 1;
 }
