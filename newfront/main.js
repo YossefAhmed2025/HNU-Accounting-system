@@ -1,5 +1,4 @@
 // ================== التخزين الأساسي ==================
-
 let accounts = JSON.parse(localStorage.getItem("accounts")) || [];
 let entries  = JSON.parse(localStorage.getItem("entries"))  || [];
 
@@ -12,7 +11,6 @@ function saveEntries() {
 }
 
 // ================== صفحة الحسابات ==================
-
 function initAccountsPage() {
   const form  = document.getElementById("form-account");
   const table = document.querySelector("#tbl-accounts tbody");
@@ -21,13 +19,19 @@ function initAccountsPage() {
   form.onsubmit = (e) => {
     e.preventDefault();
 
+    const reportType  = form.report_type  ? form.report_type.value  : "financial";
+    const incomeType  = form.income_type  ? form.income_type.value  : "";
+    const incomeGroup = form.income_group ? form.income_group.value : "";
+
     const acc = {
       id: Date.now(),
       code: form.code.value.trim(),
       name: form.name.value.trim(),
       opening_balance: parseFloat(form.opening_balance.value) || 0,
-      balance_type: form.balance_type.value  // "مدين" أو "دائن"
-      // ممكن تضيف بعدين: category, note, noteNumber ...
+      balance_type: form.balance_type.value,   // مدين / دائن
+      report_type: reportType,                 // financial / income
+      category: incomeType || null,            // revenue / expense / null
+      income_group: incomeGroup || null        // للتوسع لاحقًا
     };
 
     const editId = form.getAttribute("data-edit-id");
@@ -53,7 +57,6 @@ function renderAccounts() {
   if (!tbody) return;
 
   tbody.innerHTML = "";
-
   accounts.forEach((acc, idx) => {
     const tr = document.createElement("tr");
     tr.innerHTML = `
@@ -79,6 +82,9 @@ function editAccount(idx) {
   form.name.value            = acc.name;
   form.opening_balance.value = acc.opening_balance;
   form.balance_type.value    = acc.balance_type;
+  if (form.report_type)  form.report_type.value  = acc.report_type || "financial";
+  if (form.income_type)  form.income_type.value  = acc.category    || "";
+  if (form.income_group) form.income_group.value = acc.income_group || "";
 
   form.setAttribute("data-edit-id", acc.id);
   window.scrollTo({ top: 0, behavior: "smooth" });
@@ -95,7 +101,6 @@ function deleteAccount(idx) {
 }
 
 // ================== صفحة القيود ==================
-
 function initEntriesPage() {
   const form   = document.getElementById("form-entry");
   const tbody  = document.querySelector("#tbl-entries tbody");
@@ -103,6 +108,7 @@ function initEntriesPage() {
 
   if (!form || !tbody || !addBtn) return;
 
+  // زر إضافة عملية جديدة
   addBtn.onclick = () => {
     const entryCode = form.entry_code.value.trim();
     const entryDate = form.entry_date.value.trim();
@@ -116,6 +122,7 @@ function initEntriesPage() {
     updateAccountOptionsForEntries();
   };
 
+  // حفظ القيد
   form.onsubmit = (e) => {
     e.preventDefault();
 
@@ -124,6 +131,13 @@ function initEntriesPage() {
 
     if (!entryDate || !entryCode) {
       alert("❌ لازم تدخل التاريخ و رقم القيد");
+      return;
+    }
+
+    // منع تكرار رقم القيد
+    const exists = entries.some(en => en.entry_code === entryCode);
+    if (exists) {
+      alert("❌ رقم القيد مسجّل من قبل، اختر رقمًا آخر.");
       return;
     }
 
@@ -174,6 +188,7 @@ function initEntriesPage() {
       totalCredit += amount;
     }
 
+    // التحقق من توازن القيد
     if (Math.abs(totalDebit - totalCredit) > 0.01) {
       alert(`❌ القيد غير متزن 
 مجموع المدين: ${totalDebit.toFixed(2)}
@@ -198,6 +213,7 @@ function initEntriesPage() {
 
   renderEntries();
 }
+
 
 function addTransactionRow(entryCode) {
   const container = document.getElementById("transactions-container");
@@ -279,12 +295,19 @@ function renderEntries() {
 
   entries.forEach((entry, eIdx) => {
     entry.transactions.forEach((tr, tIdx) => {
+      // نجيب بيانات الحسابين من مصفوفة الحسابات
+      const debitAcc  = accounts.find(a => a.code === tr.debit_account);
+      const creditAcc = accounts.find(a => a.code === tr.credit_account);
+
+      const debitLabel  = debitAcc  ? `${debitAcc.name} (${debitAcc.code})`   : tr.debit_account;
+      const creditLabel = creditAcc ? `${creditAcc.name} (${creditAcc.code})` : tr.credit_account;
+
       const row = document.createElement("tr");
       row.innerHTML = `
         <td>${entry.entry_date}</td>
-        <td>${tr.debit_account}</td>
+        <td>${debitLabel}</td>
         <td>${tr.debit_cc}</td>
-        <td>${tr.credit_account}</td>
+        <td>${creditLabel}</td>
         <td>${tr.credit_cc}</td>
         <td>${tr.amount.toFixed(2)}</td>
         <td>${tr.description}</td>
@@ -302,6 +325,7 @@ function renderEntries() {
   });
 }
 
+
 function deleteEntry(eIdx, tIdx) {
   if (!confirm("هل تريد حذف هذه العملية؟")) return;
 
@@ -314,7 +338,6 @@ function deleteEntry(eIdx, tIdx) {
 }
 
 // ================== دفتر الأستاذ ==================
-
 function initLedgerPage() {
   const tbl = document.getElementById("tbl-ledger");
   if (!tbl) return;
@@ -359,7 +382,6 @@ function renderLedger() {
 }
 
 // ================== ميزان المراجعة ==================
-
 function initTrialBalancePage() {
   const tbl = document.getElementById("tbl-trial");
   if (!tbl) return;
@@ -383,7 +405,6 @@ function renderTrialBalance() {
       });
     });
 
-    // رصيد أول المدة كموجب/سالب حسب النوع
     let openingSigned = acc.opening_balance;
     if (acc.balance_type === "دائن") {
       openingSigned = -openingSigned;
@@ -416,7 +437,6 @@ function renderTrialBalance() {
 }
 
 // ================== قائمة المركز المالي ==================
-
 function initFinancialPositionPage() {
   const btn   = document.getElementById("generate-financial");
   const from  = document.getElementById("from-year");
@@ -435,10 +455,6 @@ function renderFinancialPosition(fromYear, toYear) {
   const tbody = document.querySelector("#tbl-financial tbody");
   if (!tbody) return;
   tbody.innerHTML = "";
-
-  // category للحسابات (تضبطها انت في الداتا):
-  // 'non_current_asset', 'current_asset', 'non_current_liability',
-  // 'current_liability', 'equity'
 
   let totalNonCurrentAssets = 0;
   let totalCurrentAssets    = 0;
@@ -474,7 +490,6 @@ function renderFinancialPosition(fromYear, toYear) {
     tbody.appendChild(tr);
   }
 
-  // الأصول طويلة الأجل
   accounts.filter(a => a.category === "non_current_asset").forEach(acc => {
     const bal = finalBalanceFor(acc);
     totalNonCurrentAssets += bal;
@@ -483,7 +498,6 @@ function renderFinancialPosition(fromYear, toYear) {
   addRow("مجموع الأصول طويلة الأجل", "", "", "", totalNonCurrentAssets, true);
   addRow("","", "", "", null);
 
-  // الأصول المتداولة
   accounts.filter(a => a.category === "current_asset").forEach(acc => {
     const bal = finalBalanceFor(acc);
     totalCurrentAssets += bal;
@@ -495,7 +509,6 @@ function renderFinancialPosition(fromYear, toYear) {
   addRow("إجمالي الأصول", "", "", "", totalAssets, true);
   addRow("","", "", "", null);
 
-  // الخصوم طويلة الأجل + حقوق الملكية
   accounts.filter(a =>
     a.category === "non_current_liability" ||
     a.category === "equity"
@@ -507,7 +520,6 @@ function renderFinancialPosition(fromYear, toYear) {
   addRow("مجموع الخصوم طويلة الأجل وحقوق الملكية", "", "", "", totalNonCurrentLiabEq, true);
   addRow("","", "", "", null);
 
-  // الالتزامات قصيرة الأجل
   accounts.filter(a => a.category === "current_liability").forEach(acc => {
     const bal = finalBalanceFor(acc);
     totalCurrentLiab += bal;
@@ -523,12 +535,132 @@ function renderFinancialPosition(fromYear, toYear) {
   addRow("الفرق بين إجمالي الأصول وإجمالي الخصوم والالتزامات", "", "", "", diff, true);
 }
 
-// ================== تهيئة الصفحات ==================
+// ================== قائمة الدخل ==================
+function initIncomeStatementPage() {
+  const btn   = document.getElementById("generate-report-is");
+  const from  = document.getElementById("from-year-is");
+  const to    = document.getElementById("to-year-is");
+  const tbody = document.querySelector("#tbl-income-statement tbody");
+  if (!btn || !from || !to || !tbody) return;
 
+  btn.onclick = () => {
+    const fromYear = from.value || "";
+    const toYear   = to.value   || "";
+    renderIncomeStatement(fromYear, toYear);
+  };
+}
+
+function renderIncomeStatement(fromYear, toYear) {
+  const tbody = document.querySelector("#tbl-income-statement tbody");
+  if (!tbody) return;
+  tbody.innerHTML = "";
+
+  let totalTuition   = 0; // إيرادات المصروفات الدراسية
+  let totalAdmin     = 0; // إيرادات المصروفات الإدارية
+  let totalExpense   = 0; // كل المصروفات
+  let totalSalaries  = 0; // المرتبات والأجور والبدلات (حساب 40)
+  let totalOperating = 0; // مصروفات التشغيل (حساب 30)
+
+  function classifyRevenueByCostCenter(credit_cc) {
+    if (!credit_cc) return null;
+
+    const parts = credit_cc.split("-");
+    if (parts.length !== 4) return null;
+
+    const [h, f, p, o] = parts;
+
+    if (h !== "20") return null;
+
+    if (f === "00" && p === "00" && o !== "00") {
+      return "admin_fee";
+    }
+    return "tuition_fee";
+  }
+
+  function classifyExpenseByCostCenter(debit_cc) {
+    if (!debit_cc) return null;
+
+    const parts = debit_cc.split("-");
+    if (parts.length !== 4) return null;
+
+    const [h] = parts;
+
+    if (h === "40") return "salaries";
+    if (h === "30") return "operating";
+    return null;
+  }
+
+  function addRow(label, note, fromY, toY, amount, isTotal=false) {
+    const tr = document.createElement("tr");
+    tr.innerHTML = `
+      <td>${label}</td>
+      <td>${note || ""}</td>
+      <td>${fromY || ""}</td>
+      <td>${toY || ""}</td>
+      <td style="text-align:center;">${amount != null ? Math.abs(amount).toFixed(2) : ""}</td>
+    `;
+    if (isTotal) tr.style.fontWeight = "700";
+    tbody.appendChild(tr);
+  }
+
+  entries.forEach(entry => {
+    (entry.transactions || []).forEach(tr => {
+      const creditAcc = accounts.find(a => a.code === tr.credit_account);
+      const debitAcc  = accounts.find(a => a.code === tr.debit_account);
+
+      const group = classifyRevenueByCostCenter(tr.credit_cc);
+      if (group === "tuition_fee") {
+        totalTuition += tr.amount;
+      } else if (group === "admin_fee") {
+        totalAdmin += tr.amount;
+      }
+
+      if (debitAcc && debitAcc.category === "expense") {
+        totalExpense += tr.amount;
+
+        const expGroup = classifyExpenseByCostCenter(tr.debit_cc);
+        if (expGroup === "salaries") {
+          totalSalaries += tr.amount;
+        } else if (expGroup === "operating") {
+          totalOperating += tr.amount;
+        }
+      }
+    });
+  });
+
+  addRow("إيرادات العملية التعليمية", "", "", "", null, false);
+  addRow("إيرادات المصروفات الدراسية", "", fromYear, toYear, totalTuition, true);
+  addRow("","", "", "", null);
+  addRow("إيرادات المصروفات الإدارية", "", fromYear, toYear, totalAdmin, true);
+  addRow("","", "", "", null);
+
+  const totalTeachingRevenue = totalTuition + totalAdmin;
+  addRow("إجمالي إيرادات العملية التعليمية", "", "", "", totalTeachingRevenue, true);
+  addRow("","", "", "", null);
+
+  // يخصم:
+  addRow("يخصم:", "", "", "", null, false);
+  addRow("المرتبات والأجور والبدلات", "", fromYear, toYear, totalSalaries, true);
+  addRow("مصروفات التشغيل", "", fromYear, toYear, totalOperating, true);
+  addRow("","", "", "", null);
+
+  const totalDeduct = totalSalaries + totalOperating;
+  addRow("إجمالي الخصومات من إيرادات العملية التعليمية", "", "", "", totalDeduct, true);
+  addRow("","", "", "", null);
+
+  const teachingNet = totalTeachingRevenue - totalDeduct;
+  addRow("فائض او عجز العملية التعليمية بعد الخصم", "", "", "", teachingNet, true);
+  addRow("","", "", "", null);
+
+  // ممكن لاحقًا تضيف صافي الدخل العام باستخدام totalExpense لو حبيت
+}
+
+// ================== تهيئة الصفحات ==================
 document.addEventListener("DOMContentLoaded", () => {
   if (document.getElementById("form-account"))       initAccountsPage();
   if (document.getElementById("form-entry"))         initEntriesPage();
   if (document.getElementById("tbl-ledger"))         initLedgerPage();
   if (document.getElementById("tbl-trial"))          initTrialBalancePage();
   if (document.getElementById("generate-financial")) initFinancialPositionPage();
+  if (document.getElementById("generate-report-is")) initIncomeStatementPage();
 });
