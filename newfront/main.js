@@ -1,68 +1,104 @@
+// ================== التخزين الأساسي ==================
 let accounts = JSON.parse(localStorage.getItem("accounts")) || [];
-let entries = JSON.parse(localStorage.getItem("entries")) || [];
+let entries  = JSON.parse(localStorage.getItem("entries"))  || [];
+let users    = JSON.parse(localStorage.getItem("users"))    || [];
 
-const pages = document.querySelectorAll(".page");
+// ================== بيانات الكليات والبرامج ==================
+const collegesData = {
+  "كلية الطب البشري": [
+    "برنامج الطب والجراحة"
+  ],
+  "كلية طب الأسنان": [
+    "برنامج طب وجراحة الفم والأسنان"
+  ],
+  "كلية العلاج الطبيعي": [
+    "برنامج العلاج الطبيعي"
+  ],
+  "كلية الهندسة": [
+    "برنامج هندسة العمارة والتصميم البيئي",
+    "برنامج هندسة النظم الذكية",
+    "برنامج هندسة الروبوتات والميكاترونيات",
+    "برنامج الأمن السيبراني"
+  ],
+  "كلية العلوم والإنسانيات (قطاع الأعمال)": [
+    "برنامج إدارة الأعمال والتحول الرقمي (BDIT)",
+    "برنامج الاقتصاد الرقمي وريادة الأعمال",
+    "برنامج اللوجستيات وسلاسل الإمداد"
+  ],
+  "كلية الفنون والفنون التطبيقية": [
+    "برنامج التصميم الداخلي البيئي",
+    "برنامج الرسوم المتحركة والمؤثرات البصرية",
+    "برنامج الاتصال البصري وفنون الميديا"
+  ],
+  "كلية العلوم الصحية التطبيقية": [
+    "برنامج تكنولوجيا المختبرات الطبية"
+  ],
+  "كلية العلوم": [
+    "برنامج التكنولوجيا الحيوية والهندسة الوراثية",
+    "برنامج علوم الكيمياء الصناعية"
+  ],
+  "كلية العلوم الإنسانية": [
+    "برنامج الدراسات القانونية"
+  ]
+};
 
-// Navigation
-document.querySelector("#nav-accounts").onclick = () =>
-  showPage("section-accounts");
-document.querySelector("#nav-entry").onclick = () => showPage("section-entry");
-document.querySelector("#nav-ledger").onclick = () =>
-  showPage("section-ledger");
-document.querySelector("#nav-trial").onclick = () => showPage("section-trial");
-document.querySelector("#nav-financial").onclick = () =>
-  showPage("section-financial");
-document.querySelector("#nav-users").onclick = () =>
-  showPage("section-users-list");
-document.querySelector("#nav-finyear").onclick = () =>
-  showPage("section-financial-year");
-document.querySelector("#nav-yearclose").onclick = () =>
-  showPage("section-year-close");
-document.querySelector("#nav-journal").onclick = () =>
-  showPage("section-journal");
-document.querySelector("#nav-reports").onclick = () =>
-  showPage("section-expenses-faculty");
-document.querySelector("#nav-search").onclick = () =>
-  showPage("section-search");
-
-function showPage(id) {
-  pages.forEach((p) => {
-    p.style.display = "none";
-    p.classList.remove("active");
-  });
-  const page = document.getElementById(id);
-  if (page) {
-    page.style.display = "block";
-    page.classList.add("active");
-  }
-  if (id === "section-ledger") renderLedger();
-  if (id === "section-trial") renderTrialBalance();
-  if (id === "section-entry") updateAccountOptions();
+// حفظ في localStorage
+function saveAccounts() {
+  localStorage.setItem("accounts", JSON.stringify(accounts));
+}
+function saveEntries() {
+  localStorage.setItem("entries", JSON.stringify(entries));
+}
+function saveUsers() {
+  localStorage.setItem("users", JSON.stringify(users));
 }
 
-// ===== الحسابات =====
-document.getElementById("form-account").onsubmit = (e) => {
-  e.preventDefault();
-  const form = e.target;
+// ================== صفحة الحسابات ==================
+function initAccountsPage() {
+  const form  = document.getElementById("form-account");
+  const table = document.querySelector("#tbl-accounts tbody");
+  if (!form || !table) return;
 
-  const acc = {
-    id: Date.now(),
-    code: form.code.value.trim(),
-    name: form.name.value.trim(),
-    opening_balance: parseFloat(form.opening_balance.value),
-    balance_type: form.balance_type.value,
+  form.onsubmit = (e) => {
+    e.preventDefault();
+
+    const reportType  = form.report_type  ? form.report_type.value  : "financial";
+    const incomeType  = form.income_type  ? form.income_type.value  : "";
+    const incomeGroup = form.income_group ? form.income_group.value : "";
+
+    const acc = {
+      id: Date.now(),
+      code: form.code.value.trim(),
+      name: form.name.value.trim(),
+      opening_balance: parseFloat(form.opening_balance.value) || 0,
+      balance_type: form.balance_type.value,   // مدين / دائن
+      report_type: reportType,                 // financial / income
+      category: incomeType || null,            // revenue / expense / null
+      income_group: incomeGroup || null        // للتوسع لاحقًا
+    };
+
+    const editId = form.getAttribute("data-edit-id");
+    if (editId) {
+      const idx = accounts.findIndex(a => String(a.id) === editId);
+      if (idx !== -1) accounts[idx] = acc;
+      form.removeAttribute("data-edit-id");
+    } else {
+      accounts.push(acc);
+    }
+
+    saveAccounts();
+    form.reset();
+    renderAccounts();
+    alert("✅ تم حفظ الحساب بنجاح");
   };
 
-  accounts.push(acc);
-  localStorage.setItem("accounts", JSON.stringify(accounts));
-  form.reset();
   renderAccounts();
-  updateAccountOptions();
-  alert("✅ تم حفظ الحساب بنجاح");
-};
+}
 
 function renderAccounts() {
   const tbody = document.querySelector("#tbl-accounts tbody");
+  if (!tbody) return;
+
   tbody.innerHTML = "";
   accounts.forEach((acc, idx) => {
     const tr = document.createElement("tr");
@@ -72,8 +108,8 @@ function renderAccounts() {
       <td>${acc.opening_balance.toFixed(2)}</td>
       <td>${acc.balance_type}</td>
       <td>
-        <button onclick="editAccount(${idx})" class="small-btn">✏️ تعديل</button>
-        <button onclick="deleteAccount(${idx})" class="small-btn">🗑️ حذف</button>
+        <button type="button" class="small-btn" onclick="editAccount(${idx})">تعديل</button>
+        <button type="button" class="small-btn" onclick="deleteAccount(${idx})">حذف</button>
       </td>
     `;
     tbody.appendChild(tr);
@@ -81,284 +117,519 @@ function renderAccounts() {
 }
 
 function editAccount(idx) {
-  const acc = accounts[idx];
+  const acc  = accounts[idx];
   const form = document.getElementById("form-account");
-  form.code.value = acc.code;
-  form.name.value = acc.name;
+  if (!acc || !form) return;
+
+  form.code.value            = acc.code;
+  form.name.value            = acc.name;
   form.opening_balance.value = acc.opening_balance;
-  form.balance_type.value = acc.balance_type;
+  form.balance_type.value    = acc.balance_type;
+  if (form.report_type)  form.report_type.value  = acc.report_type || "financial";
+  if (form.income_type)  form.income_type.value  = acc.category    || "";
+  if (form.income_group) form.income_group.value = acc.income_group || "";
 
-  const oldSubmit = form.onsubmit;
-  form.onsubmit = (e) => {
-    e.preventDefault();
-    accounts.splice(idx, 1);
-    oldSubmit.call(form, { target: form, preventDefault: () => {} });
-    form.onsubmit = oldSubmit;
-  };
-
-  showPage("section-accounts");
-  window.scrollTo(0, 0);
+  form.setAttribute("data-edit-id", acc.id);
+  window.scrollTo({ top: 0, behavior: "smooth" });
 }
 
 function deleteAccount(idx) {
-  if (confirm("هل تريد حذف هذا الحساب؟")) {
-    accounts.splice(idx, 1);
-    localStorage.setItem("accounts", JSON.stringify(accounts));
-    renderAccounts();
-    updateAccountOptions();
-  }
+  const acc = accounts[idx];
+  if (!acc) return;
+  if (!confirm(`هل تريد حذف الحساب: ${acc.name} ؟`)) return;
+
+  accounts.splice(idx, 1);
+  saveAccounts();
+  renderAccounts();
 }
 
-function updateAccountOptions() {
-  const opts = accounts
-    .map((a) => `<option value="${a.code}">${a.name} (${a.code})</option>`)
-    .join("");
-  document.querySelectorAll(".account-debit, .account-credit").forEach((s) => {
-    s.innerHTML = `<option value="">-- اختر حساب --</option>${opts}`;
-  });
-}
+// ================== صفحة القيود ==================
+function initEntriesPage() {
+  const form        = document.getElementById("form-entry");
+  const tbody       = document.querySelector("#tbl-entries tbody");
+  const addDebitBtn = document.getElementById("add-debit");
+  const addCreditBtn = document.getElementById("add-credit");
 
-// ===== تنسيق مركز التكلفة =====
-function formatCostCenter(code) {
-  if (!code || code.length < 8) return "N/A";
-  return `${code.substring(0, 2)}-${code.substring(2, 4)}-${code.substring(
-    4,
-    6
-  )}-${code.substring(6, 8)}`;
-}
+  if (!form || !tbody || !addDebitBtn || !addCreditBtn) return;
 
-// ===== القيود =====
-function createTransactionRow(entryCode) {
-  const div = document.createElement("div");
-  div.className = "transaction";
-
-  const opts = accounts
-    .map((a) => `<option value="${a.code}">${a.name} (${a.code})</option>`)
-    .join("");
-
-  div.innerHTML = `
-    <label style="flex: 1 1 160px;">الحساب المدين
-      <select class="account-debit" required>
-        <option value="">-- اختر --</option>${opts}
-      </select>
-      <div class="cost-center-input-group debit-cc-group" style="display:none;">
-        <label><span>ح</span><input type="text" class="debit-cc-1" maxlength="2" placeholder="00" /></label>
-        <label><span>ك</span><input type="text" class="debit-cc-2" maxlength="2" placeholder="00" /></label>
-        <label><span>ب</span><input type="text" class="debit-cc-3" maxlength="2" placeholder="00" /></label>
-        <label><span>خ</span><input type="text" class="debit-cc-4" maxlength="2" placeholder="00" /></label>
-      </div>
-    </label>
-    <label style="flex: 1 1 160px;">الحساب الدائن
-      <select class="account-credit" required>
-        <option value="">-- اختر --</option>${opts}
-      </select>
-      <div class="cost-center-input-group credit-cc-group" style="display:none;">
-        <label><span>ح</span><input type="text" class="credit-cc-1" maxlength="2" placeholder="00" /></label>
-        <label><span>ك</span><input type="text" class="credit-cc-2" maxlength="2" placeholder="00" /></label>
-        <label><span>ب</span><input type="text" class="credit-cc-3" maxlength="2" placeholder="00" /></label>
-        <label><span>خ</span><input type="text" class="credit-cc-4" maxlength="2" placeholder="00" /></label>
-      </div>
-    </label>
-    <label style="flex: 1 1 120px;">المبلغ
-      <input type="number" step="0.01" class="amount" required />
-    </label>
-    <label style="flex: 1 1 140px;">البيان
-      <input type="text" class="description" placeholder="بيان العملية" required />
-    </label>
-    <label style="flex: 1 1 110px;">كود القيد
-      <input type="text" class="entry-code" value="${entryCode}" readonly />
-    </label>
-    <button type="button" class="remove-transaction btn">✖</button>
-  `;
-
-  const debitSelect = div.querySelector(".account-debit");
-  const creditSelect = div.querySelector(".account-credit");
-  const debitCCGroup = div.querySelector(".debit-cc-group");
-  const creditCCGroup = div.querySelector(".credit-cc-group");
-
-  debitSelect.onchange = () => {
-    debitCCGroup.style.display = debitSelect.value ? "flex" : "none";
+  // زر إضافة حساب مدين
+  addDebitBtn.onclick = () => {
+    addDebitAccount();
+    updateAccountOptionsForEntries();
   };
 
-  creditSelect.onchange = () => {
-    creditCCGroup.style.display = creditSelect.value ? "flex" : "none";
+  // زر إضافة حساب دائن
+  addCreditBtn.onclick = () => {
+    addCreditAccount();
+    updateAccountOptionsForEntries();
   };
 
-  div.querySelector(".remove-transaction").onclick = () => div.remove();
+  // حفظ القيد
+  form.onsubmit = (e) => {
+    e.preventDefault();
 
-  return div;
-}
+    const entryDate = form.entry_date.value.trim();
+    const entryCode = form.entry_code.value.trim();
 
-document.getElementById("form-entry").onsubmit = (e) => {
-  e.preventDefault();
-
-  const date = document.querySelector('input[name="entry_date"]').value;
-  const entryCode = document.querySelector('input[name="entry_code"]').value;
-
-  if (!date || !entryCode) {
-    alert("❌ يجب تعبئة التاريخ ورقم القيد");
-    return;
-  }
-
-  const transactions = [];
-  let sumDebit = 0;
-  let sumCredit = 0;
-
-  document.querySelectorAll(".transaction").forEach((tr) => {
-    const debit = tr.querySelector(".account-debit").value;
-    const credit = tr.querySelector(".account-credit").value;
-    const amount = parseFloat(tr.querySelector(".amount").value);
-    const description = tr.querySelector(".description").value;
-
-    const debitCC =
-      (tr.querySelector(".debit-cc-1").value || "00") +
-      (tr.querySelector(".debit-cc-2").value || "00") +
-      (tr.querySelector(".debit-cc-3").value || "00") +
-      (tr.querySelector(".debit-cc-4").value || "00");
-
-    const creditCC =
-      (tr.querySelector(".credit-cc-1").value || "00") +
-      (tr.querySelector(".credit-cc-2").value || "00") +
-      (tr.querySelector(".credit-cc-3").value || "00") +
-      (tr.querySelector(".credit-cc-4").value || "00");
-
-    if (
-      !debit ||
-      !credit ||
-      !amount ||
-      !description ||
-      debitCC.length < 8 ||
-      creditCC.length < 8
-    ) {
-      alert(
-        "❌ جميع الحقول مطلوبة (الحساب المدين والدائن والمبلغ والبيان ومركز التكلفة)"
-      );
+    if (!entryDate || !entryCode) {
+      alert("❌ لازم تدخل التاريخ و رقم القيد");
       return;
     }
 
-    transactions.push({
-      debit_account: debit,
-      debit_cost_center: debitCC,
-      credit_account: credit,
-      credit_cost_center: creditCC,
-      amount,
-      description,
-    });
+    // منع تكرار رقم القيد
+    const exists = entries.some(en => en.entry_code === entryCode);
+    if (exists) {
+      alert("❌ رقم القيد مسجّل من قبل، اختر رقمًا آخر.");
+      return;
+    }
 
-    sumDebit += amount;
-    sumCredit += amount;
-  });
+    const debitItems  = document.querySelectorAll("#debit-container .account-item");
+    const creditItems = document.querySelectorAll("#credit-container .account-item");
 
-  if (transactions.length === 0) {
-    alert("❌ يجب إضافة عملية واحدة على الأقل");
-    return;
-  }
+    if (debitItems.length === 0 && creditItems.length === 0) {
+      alert("❌ لازم تضيف حساب مدين أو دائن واحد على الأقل");
+      return;
+    }
 
-  if (Math.abs(sumDebit - sumCredit) > 0.01) {
-    alert(`❌ عدم التوازن! 
-    مجموع المدين: ${sumDebit.toFixed(2)}
-    مجموع الدائن: ${sumCredit.toFixed(2)}
-    الفرق: ${Math.abs(sumDebit - sumCredit).toFixed(2)}`);
-    return;
-  }
+    const transactions = [];
+    let totalDebit  = 0;
+    let totalCredit = 0;
 
-  const entryData = {
-    id: Date.now(),
-    entry_date: date,
-    entry_code: entryCode,
-    transactions,
+    // جمع البيانات من الحسابات المدينة
+    const debitAccounts = [];
+    for (const item of debitItems) {
+      const account = item.querySelector(".account-select").value;
+      const amount  = parseFloat(item.querySelector(".amount-input").value) || 0;
+      const desc    = item.querySelector(".description-input").value.trim();
+
+      const h = item.querySelector(".cc-h").value || "00";
+      const k = item.querySelector(".cc-k").value || "00";
+      const b = item.querySelector(".cc-b").value || "00";
+      const o = item.querySelector(".cc-o").value || "00";
+      const costCenter = `${h}-${k}-${b}-${o}`;
+
+      if (!account) {
+        alert("❌ كل حساب مدين لازم تختار الحساب");
+        return;
+      }
+      if (amount <= 0) {
+        alert("❌ كل حساب مدين لازم يكون له مبلغ أكبر من صفر");
+        return;
+      }
+
+      debitAccounts.push({ account, amount, desc, costCenter });
+      totalDebit += amount;
+    }
+
+    // جمع البيانات من الحسابات الدائنة
+    const creditAccounts = [];
+    for (const item of creditItems) {
+      const account = item.querySelector(".account-select").value;
+      const amount  = parseFloat(item.querySelector(".amount-input").value) || 0;
+      const desc    = item.querySelector(".description-input").value.trim();
+
+      const h = item.querySelector(".cc-h").value || "00";
+      const k = item.querySelector(".cc-k").value || "00";
+      const b = item.querySelector(".cc-b").value || "00";
+      const o = item.querySelector(".cc-o").value || "00";
+      const costCenter = `${h}-${k}-${b}-${o}`;
+
+      if (!account) {
+        alert("❌ كل حساب دائن لازم تختار الحساب");
+        return;
+      }
+      if (amount <= 0) {
+        alert("❌ كل حساب دائن لازم يكون له مبلغ أكبر من صفر");
+        return;
+      }
+
+      creditAccounts.push({ account, amount, desc, costCenter });
+      totalCredit += amount;
+    }
+
+    // التحقق من توازن القيد
+    if (Math.abs(totalDebit - totalCredit) > 0.01) {
+      alert(`❌ القيد غير متزن
+مجموع المدين: ${totalDebit.toFixed(2)}
+مجموع الدائن: ${totalCredit.toFixed(2)}`);
+      return;
+    }
+
+    // إنشاء العمليات (transactions) من الحسابات
+    // كل حساب مدين مع كل حساب دائن
+    for (const deb of debitAccounts) {
+      for (const cred of creditAccounts) {
+        // نسبة المبلغ حسب النسبة بين الحسابات
+        const ratio = (deb.amount / totalDebit) * (cred.amount / totalCredit);
+        const transAmount = Math.min(deb.amount, cred.amount);
+
+        transactions.push({
+          debit_account:  deb.account,
+          debit_cc:       deb.costCenter,
+          debit_amount:   deb.amount,
+          credit_account: cred.account,
+          credit_cc:      cred.costCenter,
+          credit_amount:  cred.amount,
+          description:    deb.desc || cred.desc || "بدون بيان"
+        });
+      }
+    }
+
+    // إذا كان عدد الحسابات غير متساوي، نحفظ كل حساب مع أول حساب من الجانب الآخر
+    if (debitAccounts.length > 0 && creditAccounts.length > 0) {
+      transactions.length = 0; // نمسح العمليات السابقة
+
+      const maxLen = Math.max(debitAccounts.length, creditAccounts.length);
+      for (let i = 0; i < maxLen; i++) {
+        const deb  = debitAccounts[i] || debitAccounts[0];
+        const cred = creditAccounts[i] || creditAccounts[0];
+
+        transactions.push({
+          debit_account:  deb.account,
+          debit_cc:       deb.costCenter,
+          debit_amount:   deb.amount,
+          credit_account: cred.account,
+          credit_cc:      cred.costCenter,
+          credit_amount:  cred.amount,
+          description:    deb.desc || cred.desc || "بدون بيان"
+        });
+      }
+    }
+
+    const entryObj = {
+      id: Date.now(),
+      entry_date: entryDate,
+      entry_code: entryCode,
+      transactions
+    };
+
+    entries.push(entryObj);
+    saveEntries();
+    form.reset();
+    document.getElementById("debit-container").innerHTML = "";
+    document.getElementById("credit-container").innerHTML = "";
+    renderEntries();
+    alert("✅ تم حفظ القيد بنجاح");
   };
 
-  entries.push(entryData);
-  localStorage.setItem("entries", JSON.stringify(entries));
-
-  alert("✅ تم حفظ القيد بنجاح برقم: " + entryCode);
-  document.getElementById("form-entry").reset();
-  document.getElementById("transactions-container").innerHTML = "";
   renderEntries();
-};
+}
 
-document.getElementById("add-transaction").onclick = () => {
-  const entryCode = document.querySelector('input[name="entry_code"]').value;
-  if (!entryCode) {
-    alert("❌ يجب إدخال رقم القيد أولاً");
-    return;
-  }
-  document
-    .getElementById("transactions-container")
-    .appendChild(createTransactionRow(entryCode));
-};
 
-document
-  .getElementById("transactions-container")
-  .addEventListener("click", (e) => {
-    if (e.target.classList.contains("remove-transaction")) {
-      e.target.closest(".transaction").remove();
+// إضافة حساب مدين
+function addDebitAccount() {
+  const container = document.getElementById("debit-container");
+  const item = document.createElement("div");
+  item.className = "account-item";
+
+  item.innerHTML = `
+    <button type="button" class="remove-account">✖ حذف</button>
+
+    <label>الحساب
+      <div class="account-search-container">
+        <input
+          type="text"
+          class="account-search-input"
+          placeholder="ابحث باسم أو رقم الحساب..."
+          autocomplete="off"
+        />
+        <button type="button" class="dropdown-toggle">▼</button>
+        <div class="account-dropdown-list"></div>
+        <input type="hidden" class="account-select" />
+      </div>
+    </label>
+
+    <label>مركز التكلفة
+      <div class="cost-center-input-group">
+        <label>ح <input type="text" maxlength="2" class="cc-h" placeholder="00" /></label>
+        <label>ك <input type="text" maxlength="2" class="cc-k" placeholder="00" /></label>
+        <label>ب <input type="text" maxlength="2" class="cc-b" placeholder="00" /></label>
+        <label>أ <input type="text" maxlength="2" class="cc-o" placeholder="00" /></label>
+      </div>
+    </label>
+
+    <label>المبلغ
+      <input type="number" step="0.01" class="amount-input" placeholder="0.00" />
+    </label>
+
+    <label>البيان
+      <input type="text" class="description-input" placeholder="بيان الحساب" />
+    </label>
+  `;
+
+  const removeBtn = item.querySelector(".remove-account");
+  const searchInput = item.querySelector(".account-search-input");
+  const dropdownToggleBtn = item.querySelector(".dropdown-toggle");
+  const hiddenSelect = item.querySelector(".account-select");
+  const dropdownList = item.querySelector(".account-dropdown-list");
+
+  removeBtn.onclick = () => item.remove();
+
+  // Event listener for search input
+  searchInput.addEventListener("input", () => {
+    const query = searchInput.value.toLowerCase().trim();
+    updateAccountDropdown(query, hiddenSelect, dropdownList, searchInput);
+  });
+
+  // Show dropdown when input is focused
+  searchInput.addEventListener("focus", () => {
+    updateAccountDropdown("", hiddenSelect, dropdownList, searchInput);
+  });
+
+  // Toggle dropdown when button is clicked
+  dropdownToggleBtn.addEventListener("click", (e) => {
+    e.preventDefault();
+    const isHidden = dropdownList.style.display === "none";
+    if (isHidden) {
+      updateAccountDropdown("", hiddenSelect, dropdownList, searchInput);
+    } else {
+      dropdownList.style.display = "none";
     }
   });
 
+  // Close dropdown when clicking outside
+  document.addEventListener("click", (e) => {
+    // تحقق إذا كانت النقرة خارج حاوية البحث
+    if (!item.querySelector(".account-search-container").contains(e.target)) {
+      dropdownList.style.display = "none";
+    }
+  });
+
+  container.appendChild(item);
+}
+
+// إضافة حساب دائن
+function addCreditAccount() {
+  const container = document.getElementById("credit-container");
+  const item = document.createElement("div");
+  item.className = "account-item";
+
+  item.innerHTML = `
+    <button type="button" class="remove-account">✖ حذف</button>
+
+    <label>الحساب
+      <div class="account-search-container">
+        <input
+          type="text"
+          class="account-search-input"
+          placeholder="ابحث باسم أو رقم الحساب..."
+          autocomplete="off"
+        />
+        <button type="button" class="dropdown-toggle">▼</button>
+        <div class="account-dropdown-list"></div>
+        <input type="hidden" class="account-select" />
+      </div>
+    </label>
+
+    <label>مركز التكلفة
+      <div class="cost-center-input-group">
+        <label>ح <input type="text" maxlength="2" class="cc-h" placeholder="00" /></label>
+        <label>ك <input type="text" maxlength="2" class="cc-k" placeholder="00" /></label>
+        <label>ب <input type="text" maxlength="2" class="cc-b" placeholder="00" /></label>
+        <label>أ <input type="text" maxlength="2" class="cc-o" placeholder="00" /></label>
+      </div>
+    </label>
+
+    <label>المبلغ
+      <input type="number" step="0.01" class="amount-input" placeholder="0.00" />
+    </label>
+
+    <label>البيان
+      <input type="text" class="description-input" placeholder="بيان الحساب" />
+    </label>
+  `;
+
+  const removeBtn = item.querySelector(".remove-account");
+  const searchInput = item.querySelector(".account-search-input");
+  const dropdownToggleBtn = item.querySelector(".dropdown-toggle");
+  const hiddenSelect = item.querySelector(".account-select");
+  const dropdownList = item.querySelector(".account-dropdown-list");
+
+  removeBtn.onclick = () => item.remove();
+
+  // Event listener for search input
+  searchInput.addEventListener("input", () => {
+    const query = searchInput.value.toLowerCase().trim();
+    updateAccountDropdown(query, hiddenSelect, dropdownList, searchInput);
+  });
+
+  // Show dropdown when input is focused
+  searchInput.addEventListener("focus", () => {
+    updateAccountDropdown("", hiddenSelect, dropdownList, searchInput);
+  });
+
+  // Toggle dropdown when button is clicked
+  dropdownToggleBtn.addEventListener("click", (e) => {
+    e.preventDefault();
+    const isHidden = dropdownList.style.display === "none";
+    if (isHidden) {
+      updateAccountDropdown("", hiddenSelect, dropdownList, searchInput);
+    } else {
+      dropdownList.style.display = "none";
+    }
+  });
+
+  // Close dropdown when clicking outside
+  document.addEventListener("click", (e) => {
+    // تحقق إذا كانت النقرة خارج حاوية البحث
+    if (!item.querySelector(".account-search-container").contains(e.target)) {
+      dropdownList.style.display = "none";
+    }
+  });
+
+  container.appendChild(item);
+}
+
+// دالة تحديث dropdown قائمة الحسابات مع البحث
+function updateAccountDropdown(query, hiddenSelect, dropdownList, searchInput) {
+  // تصفية الحسابات بناءً على البحث
+  const filteredAccounts = accounts.filter(acc => {
+    const searchText = query.toLowerCase();
+    const nameMatch = acc.name.toLowerCase().includes(searchText);
+    const codeMatch = acc.code.toLowerCase().includes(searchText);
+    return nameMatch || codeMatch;
+  });
+
+  // تنظيف القائمة
+  dropdownList.innerHTML = "";
+
+  if (filteredAccounts.length === 0) {
+    dropdownList.style.display = "none";
+    return;
+  }
+
+  // إضافة كل حساب إلى القائمة
+  filteredAccounts.forEach(acc => {
+    const option = document.createElement("div");
+    option.className = "dropdown-option";
+    option.innerHTML = `<strong>${acc.name}</strong> <span class="code">(${acc.code})</span>`;
+    option.style.cursor = "pointer";
+    option.style.padding = "8px 12px";
+    option.style.borderBottom = "1px solid rgba(255,255,255,0.1)";
+
+    option.addEventListener("click", () => {
+      hiddenSelect.value = acc.code;
+      searchInput.value = `${acc.name} (${acc.code})`;
+      dropdownList.style.display = "none";
+    });
+
+    option.addEventListener("mouseenter", () => {
+      option.style.backgroundColor = "rgba(6, 182, 212, 0.2)";
+    });
+
+    option.addEventListener("mouseleave", () => {
+      option.style.backgroundColor = "transparent";
+    });
+
+    dropdownList.appendChild(option);
+  });
+
+  dropdownList.style.display = "block";
+}
+
+function updateAccountOptionsForEntries() {
+  const allSelects = document.querySelectorAll(".account-select");
+
+  const opts = accounts
+    .map(a => `<option value="${a.code}">${a.name} (${a.code})</option>`)
+    .join("");
+
+  allSelects.forEach(sel => {
+    const current = sel.value;
+    sel.innerHTML = `<option value="">-- اختر الحساب --</option>${opts}`;
+    if (current) sel.value = current;
+  });
+}
+
 function renderEntries() {
   const tbody = document.querySelector("#tbl-entries tbody");
+  if (!tbody) return;
+
   tbody.innerHTML = "";
 
-  entries.forEach((entry, entryIdx) => {
-    entry.transactions.forEach((tr, trIdx) => {
+  entries.forEach((entry, eIdx) => {
+    entry.transactions.forEach((tr, tIdx) => {
+      // نجيب بيانات الحسابين من مصفوفة الحسابات
+      const debitAcc  = accounts.find(a => a.code === tr.debit_account);
+      const creditAcc = accounts.find(a => a.code === tr.credit_account);
+
+      const debitLabel  = debitAcc  ? `${debitAcc.name} (${debitAcc.code})`   : tr.debit_account;
+      const creditLabel = creditAcc ? `${creditAcc.name} (${creditAcc.code})` : tr.credit_account;
+
+      // دعم الصيغة القديمة (amount) والجديدة (debit_amount, credit_amount)
+      const debitAmount  = tr.debit_amount  !== undefined ? tr.debit_amount  : (tr.amount || 0);
+      const creditAmount = tr.credit_amount !== undefined ? tr.credit_amount : (tr.amount || 0);
+
       const row = document.createElement("tr");
       row.innerHTML = `
         <td>${entry.entry_date}</td>
-        <td>${tr.debit_account}</td>
-        <td>${formatCostCenter(tr.debit_cost_center)}</td>
-        <td>${tr.credit_account}</td>
-        <td>${formatCostCenter(tr.credit_cost_center)}</td>
-        <td>${tr.amount.toFixed(2)}</td>
+        <td>${debitLabel}</td>
+        <td>${tr.debit_cc}</td>
+        <td>${debitAmount.toFixed(2)}</td>
+        <td>${creditLabel}</td>
+        <td>${tr.credit_cc}</td>
+        <td>${creditAmount.toFixed(2)}</td>
         <td>${tr.description}</td>
         <td>${entry.entry_code}</td>
         <td>
-          <button onclick="editEntry(${entryIdx}, ${trIdx})" class="small-btn">✏️</button>
-          <button onclick="deleteEntry(${entryIdx}, ${trIdx})" class="small-btn">🗑️</button>
+          <button type="button" class="small-btn" onclick="deleteEntry(${eIdx},${tIdx})">حذف</button>
         </td>
       `;
       tbody.appendChild(row);
     });
 
-    const gapRow = document.createElement("tr");
-    gapRow.innerHTML =
-      '<td colspan="9" style="height:15px; border:none;"></td>';
-    tbody.appendChild(gapRow);
+    const gap = document.createElement("tr");
+    gap.innerHTML = `<td colspan="10" style="border:none;height:10px;"></td>`;
+    tbody.appendChild(gap);
   });
 }
 
-function editEntry(entryIdx, trIdx) {
-  alert("⚠️ خاصية التعديل ستكون متاحة قريباً");
-}
 
-function deleteEntry(entryIdx, trIdx) {
-  if (confirm("هل تريد حذف هذه العملية؟")) {
-    entries[entryIdx].transactions.splice(trIdx, 1);
-    if (entries[entryIdx].transactions.length === 0) {
-      entries.splice(entryIdx, 1);
-    }
-    localStorage.setItem("entries", JSON.stringify(entries));
-    renderEntries();
+function deleteEntry(eIdx, tIdx) {
+  if (!confirm("هل تريد حذف هذه العملية؟")) return;
+
+  entries[eIdx].transactions.splice(tIdx, 1);
+  if (entries[eIdx].transactions.length === 0) {
+    entries.splice(eIdx, 1);
   }
+  saveEntries();
+  renderEntries();
 }
 
-// ===== دفتر الأستاذ =====
+// ================== دفتر الأستاذ ==================
+function initLedgerPage() {
+  const tbl = document.getElementById("tbl-ledger");
+  if (!tbl) return;
+  renderLedger();
+}
+
 function renderLedger() {
   const tbody = document.querySelector("#tbl-ledger tbody");
+  if (!tbody) return;
+
   tbody.innerHTML = "";
 
-  accounts.forEach((acc) => {
-    let debit = 0,
-      credit = 0;
-    entries.forEach((entry) => {
-      entry.transactions.forEach((tr) => {
-        if (tr.debit_account === acc.code) debit += tr.amount;
-        if (tr.credit_account === acc.code) credit += tr.amount;
+  accounts.forEach(acc => {
+    let debit  = 0;
+    let credit = 0;
+
+    entries.forEach(entry => {
+      (entry.transactions || []).forEach(tr => {
+        // دعم الصيغة القديمة والجديدة
+        const debitAmt  = tr.debit_amount  !== undefined ? tr.debit_amount  : (tr.amount || 0);
+        const creditAmt = tr.credit_amount !== undefined ? tr.credit_amount : (tr.amount || 0);
+
+        if (tr.debit_account  === acc.code)  debit  += debitAmt;
+        if (tr.credit_account === acc.code) credit += creditAmt;
       });
     });
 
-    const finalBalance = acc.opening_balance + debit - credit;
+    const openingSigned = acc.balance_type === "دائن"
+      ? -acc.opening_balance
+      :  acc.opening_balance;
+
+    const finalBalance = openingSigned + debit - credit;
+
     const tr = document.createElement("tr");
     tr.innerHTML = `
       <td>${acc.code}</td>
@@ -373,24 +644,46 @@ function renderLedger() {
   });
 }
 
-// ===== ميزان المراجعة =====
+// ================== ميزان المراجعة ==================
+function initTrialBalancePage() {
+  const tbl = document.getElementById("tbl-trial");
+  if (!tbl) return;
+  renderTrialBalance();
+}
+
 function renderTrialBalance() {
   const tbody = document.querySelector("#tbl-trial tbody");
+  if (!tbody) return;
+
   tbody.innerHTML = "";
 
-  accounts.forEach((acc) => {
-    let debit = 0,
-      credit = 0;
-    entries.forEach((entry) => {
-      entry.transactions.forEach((tr) => {
-        if (tr.debit_account === acc.code) debit += tr.amount;
-        if (tr.credit_account === acc.code) credit += tr.amount;
+  accounts.forEach(acc => {
+    let debit  = 0;
+    let credit = 0;
+
+    entries.forEach(entry => {
+      (entry.transactions || []).forEach(tr => {
+        // دعم الصيغة القديمة والجديدة
+        const debitAmt  = tr.debit_amount  !== undefined ? tr.debit_amount  : (tr.amount || 0);
+        const creditAmt = tr.credit_amount !== undefined ? tr.credit_amount : (tr.amount || 0);
+
+        if (tr.debit_account  === acc.code)  debit  += debitAmt;
+        if (tr.credit_account === acc.code) credit += creditAmt;
       });
     });
 
-    const opening_d = acc.balance_type === "مدين" ? acc.opening_balance : 0;
-    const opening_c = acc.balance_type === "دائن" ? acc.opening_balance : 0;
-    const final = acc.opening_balance + debit - credit;
+    let openingSigned = acc.opening_balance;
+    if (acc.balance_type === "دائن") {
+      openingSigned = -openingSigned;
+    }
+
+    const opening_d = openingSigned > 0 ? openingSigned : 0;
+    const opening_c = openingSigned < 0 ? Math.abs(openingSigned) : 0;
+
+    const total_d = opening_d + debit;
+    const total_c = opening_c + credit;
+
+    const final  = openingSigned + debit - credit;
     const final_d = final > 0 ? final : 0;
     const final_c = final < 0 ? Math.abs(final) : 0;
 
@@ -401,8 +694,8 @@ function renderTrialBalance() {
       <td>${opening_c.toFixed(2)}</td>
       <td>${debit.toFixed(2)}</td>
       <td>${credit.toFixed(2)}</td>
-      <td>${(opening_d + debit).toFixed(2)}</td>
-      <td>${(opening_c + credit).toFixed(2)}</td>
+      <td>${total_d.toFixed(2)}</td>
+      <td>${total_c.toFixed(2)}</td>
       <td>${final_d.toFixed(2)}</td>
       <td>${final_c.toFixed(2)}</td>
     `;
@@ -410,9 +703,1506 @@ function renderTrialBalance() {
   });
 }
 
-// التهيئة الأولية
+// ================== قائمة المركز المالي ==================
+function initFinancialPositionPage() {
+  const btn   = document.getElementById("generate-financial");
+  const from  = document.getElementById("from-year");
+  const to    = document.getElementById("to-year");
+  const tbody = document.querySelector("#tbl-financial tbody");
+  if (!btn || !from || !to || !tbody) return;
+
+  btn.onclick = () => {
+    const fromYear = from.value || "";
+    const toYear   = to.value   || "";
+    renderFinancialPosition(fromYear, toYear);
+  };
+}
+
+function renderFinancialPosition(fromYear, toYear) {
+  const tbody = document.querySelector("#tbl-financial tbody");
+  if (!tbody) return;
+  tbody.innerHTML = "";
+
+  let totalNonCurrentAssets = 0;
+  let totalCurrentAssets    = 0;
+  let totalNonCurrentLiabEq = 0;
+  let totalCurrentLiab      = 0;
+
+  function finalBalanceFor(acc) {
+    let debit  = 0;
+    let credit = 0;
+    entries.forEach(entry => {
+      (entry.transactions || []).forEach(tr => {
+        // دعم الصيغة القديمة والجديدة
+        const debitAmt  = tr.debit_amount  !== undefined ? tr.debit_amount  : (tr.amount || 0);
+        const creditAmt = tr.credit_amount !== undefined ? tr.credit_amount : (tr.amount || 0);
+
+        if (tr.debit_account  === acc.code)  debit  += debitAmt;
+        if (tr.credit_account === acc.code) credit += creditAmt;
+      });
+    });
+
+    let openingSigned = acc.opening_balance;
+    if (acc.balance_type === "دائن") openingSigned = -openingSigned;
+
+    return openingSigned + debit - credit;
+  }
+
+  function addRow(label, note, fromY, toY, amount, isTotal=false) {
+    const tr = document.createElement("tr");
+    tr.innerHTML = `
+      <td>${label}</td>
+      <td>${note || ""}</td>
+      <td>${fromY || ""}</td>
+      <td>${toY || ""}</td>
+      <td style="text-align:center;">${amount != null ? amount.toFixed(2) : ""}</td>
+    `;
+    if (isTotal) tr.style.fontWeight = "700";
+    tbody.appendChild(tr);
+  }
+
+  accounts.filter(a => a.category === "non_current_asset").forEach(acc => {
+    const bal = finalBalanceFor(acc);
+    totalNonCurrentAssets += bal;
+    addRow(acc.name, acc.note || "", fromYear, toYear, bal);
+  });
+  addRow("مجموع الأصول طويلة الأجل", "", "", "", totalNonCurrentAssets, true);
+  addRow("","", "", "", null);
+
+  accounts.filter(a => a.category === "current_asset").forEach(acc => {
+    const bal = finalBalanceFor(acc);
+    totalCurrentAssets += bal;
+    addRow(acc.name, acc.note || "", fromYear, toYear, bal);
+  });
+  addRow("مجموع الأصول المتداولة", "", "", "", totalCurrentAssets, true);
+
+  const totalAssets = totalNonCurrentAssets + totalCurrentAssets;
+  addRow("إجمالي الأصول", "", "", "", totalAssets, true);
+  addRow("","", "", "", null);
+
+  accounts.filter(a =>
+    a.category === "non_current_liability" ||
+    a.category === "equity"
+  ).forEach(acc => {
+    const bal = finalBalanceFor(acc);
+    totalNonCurrentLiabEq += bal;
+    addRow(acc.name, acc.note || "", fromYear, toYear, bal);
+  });
+  addRow("مجموع الخصوم طويلة الأجل وحقوق الملكية", "", "", "", totalNonCurrentLiabEq, true);
+  addRow("","", "", "", null);
+
+  accounts.filter(a => a.category === "current_liability").forEach(acc => {
+    const bal = finalBalanceFor(acc);
+    totalCurrentLiab += bal;
+    addRow(acc.name, acc.note || "", fromYear, toYear, bal);
+  });
+  addRow("مجموع الالتزامات قصيرة الأجل", "", "", "", totalCurrentLiab, true);
+
+  const totalLiab = totalNonCurrentLiabEq + totalCurrentLiab;
+  addRow("إجمالي الخصوم والالتزامات", "", "", "", totalLiab, true);
+  addRow("","", "", "", null);
+
+  const diff = totalAssets - totalLiab;
+  addRow("الفرق بين إجمالي الأصول وإجمالي الخصوم والالتزامات", "", "", "", diff, true);
+}
+
+// ================== قائمة الدخل ==================
+function initIncomeStatementPage() {
+  const btn   = document.getElementById("generate-report-is");
+  const from  = document.getElementById("from-year-is");
+  const to    = document.getElementById("to-year-is");
+  const tbody = document.querySelector("#tbl-income-statement tbody");
+  if (!btn || !from || !to || !tbody) return;
+
+  btn.onclick = () => {
+    const fromYear = from.value || "";
+    const toYear   = to.value   || "";
+    renderIncomeStatement(fromYear, toYear);
+  };
+}
+
+function renderIncomeStatement(fromYear, toYear) {
+  const tbody = document.querySelector("#tbl-income-statement tbody");
+  if (!tbody) return;
+  tbody.innerHTML = "";
+
+  let totalTuition   = 0; // إيرادات المصروفات الدراسية
+  let totalAdmin     = 0; // إيرادات المصروفات الإدارية
+  let totalExpense   = 0; // كل المصروفات
+  let totalSalaries  = 0; // المرتبات والأجور والبدلات (حساب 40)
+  let totalOperating = 0; // مصروفات التشغيل (حساب 30)
+
+  function classifyRevenueByCostCenter(credit_cc) {
+    if (!credit_cc) return null;
+
+    const parts = credit_cc.split("-");
+    if (parts.length !== 4) return null;
+
+    const [h, f, p, o] = parts;
+
+    if (h !== "20") return null;
+
+    if (f === "00" && p === "00" && o !== "00") {
+      return "admin_fee";
+    }
+    return "tuition_fee";
+  }
+
+  function classifyExpenseByCostCenter(debit_cc) {
+    if (!debit_cc) return null;
+
+    const parts = debit_cc.split("-");
+    if (parts.length !== 4) return null;
+
+    const [h] = parts;
+
+    if (h === "40") return "salaries";
+    if (h === "30") return "operating";
+    return null;
+  }
+
+  function addRow(label, note, fromY, toY, amount, isTotal=false) {
+    const tr = document.createElement("tr");
+    tr.innerHTML = `
+      <td>${label}</td>
+      <td>${note || ""}</td>
+      <td>${fromY || ""}</td>
+      <td>${toY || ""}</td>
+      <td style="text-align:center;">${amount != null ? Math.abs(amount).toFixed(2) : ""}</td>
+    `;
+    if (isTotal) tr.style.fontWeight = "700";
+    tbody.appendChild(tr);
+  }
+
+  entries.forEach(entry => {
+    (entry.transactions || []).forEach(tr => {
+      const creditAcc = accounts.find(a => a.code === tr.credit_account);
+      const debitAcc  = accounts.find(a => a.code === tr.debit_account);
+
+      // دعم الصيغة القديمة والجديدة
+      const debitAmt  = tr.debit_amount  !== undefined ? tr.debit_amount  : (tr.amount || 0);
+      const creditAmt = tr.credit_amount !== undefined ? tr.credit_amount : (tr.amount || 0);
+
+      const group = classifyRevenueByCostCenter(tr.credit_cc);
+      if (group === "tuition_fee") {
+        totalTuition += creditAmt;
+      } else if (group === "admin_fee") {
+        totalAdmin += creditAmt;
+      }
+
+      if (debitAcc && debitAcc.category === "expense") {
+        totalExpense += debitAmt;
+
+        const expGroup = classifyExpenseByCostCenter(tr.debit_cc);
+        if (expGroup === "salaries") {
+          totalSalaries += debitAmt;
+        } else if (expGroup === "operating") {
+          totalOperating += debitAmt;
+        }
+      }
+    });
+  });
+
+  addRow("إيرادات العملية التعليمية", "", "", "", null, false);
+  addRow("إيرادات المصروفات الدراسية", "", fromYear, toYear, totalTuition, true);
+  addRow("","", "", "", null);
+  addRow("إيرادات المصروفات الإدارية", "", fromYear, toYear, totalAdmin, true);
+  addRow("","", "", "", null);
+
+  const totalTeachingRevenue = totalTuition + totalAdmin;
+  addRow("إجمالي إيرادات العملية التعليمية", "", "", "", totalTeachingRevenue, true);
+  addRow("","", "", "", null);
+
+  // يخصم:
+  addRow("يخصم:", "", "", "", null, false);
+  addRow("المرتبات والأجور والبدلات", "", fromYear, toYear, totalSalaries, true);
+  addRow("مصروفات التشغيل", "", fromYear, toYear, totalOperating, true);
+  addRow("","", "", "", null);
+
+  const totalDeduct = totalSalaries + totalOperating;
+  addRow("إجمالي الخصومات من إيرادات العملية التعليمية", "", "", "", totalDeduct, true);
+  addRow("","", "", "", null);
+
+  const teachingNet = totalTeachingRevenue - totalDeduct;
+  addRow("فائض او عجز العملية التعليمية بعد الخصم", "", "", "", teachingNet, true);
+  addRow("","", "", "", null);
+
+  // ممكن لاحقًا تضيف صافي الدخل العام باستخدام totalExpense لو حبيت
+}
+
+// ================== صفحة المستخدمين ==================
+function initUsersPage() {
+  const form = document.getElementById("form-user");
+  const tbody = document.querySelector("#users-tbl tbody");
+  const searchInput = document.getElementById("search-users");
+
+  if (!form || !tbody) return;
+
+  // حفظ موظف جديد
+  form.onsubmit = (e) => {
+    e.preventDefault();
+
+    const password = form.password.value;
+    const confirmPassword = form.confirm_password.value;
+
+    if (password !== confirmPassword) {
+      alert("❌ كلمات المرور غير متطابقة");
+      return;
+    }
+
+    // جمع الصلاحيات المختارة
+    const permissions = {};
+    const permissionInputs = form.querySelectorAll("input[name^='perm_']");
+    permissionInputs.forEach(input => {
+      permissions[input.name] = input.checked;
+    });
+
+    const user = {
+      id: Date.now(),
+      fullname: form.fullname.value.trim(),
+      email: form.email.value.trim(),
+      phone: form.phone.value.trim(),
+      username: form.username.value.trim(),
+      password: password, // في بيئة production استخدم hashing
+      role: form.role.value,
+      status: form.status.value,
+      permissions: permissions,
+      created_at: new Date().toLocaleDateString("ar-EG")
+    };
+
+    // تحقق من عدم تكرار اسم المستخدم
+    const exists = users.some(u => u.username === user.username);
+    if (exists) {
+      alert("❌ اسم المستخدم مسجّل من قبل");
+      return;
+    }
+
+    users.push(user);
+    saveUsers();
+    form.reset();
+    renderUsers();
+    updateUserStats();
+    alert("✅ تم إضافة الموظف بنجاح");
+  };
+
+  // البحث عن موظف
+  searchInput.addEventListener("input", () => {
+    const query = searchInput.value.toLowerCase();
+    const filteredUsers = users.filter(u =>
+      u.fullname.toLowerCase().includes(query) ||
+      u.email.toLowerCase().includes(query) ||
+      u.username.toLowerCase().includes(query)
+    );
+    renderUsers(filteredUsers);
+  });
+
+  renderUsers();
+  updateUserStats();
+}
+
+function renderUsers(usersToRender = users) {
+  const tbody = document.querySelector("#users-tbl tbody");
+  if (!tbody) return;
+
+  tbody.innerHTML = "";
+
+  const roleMap = {
+    "super_admin": "مدير النظام",
+    "manager": "مدير",
+    "accountant": "محاسب",
+    "viewer": "مشاهد فقط"
+  };
+
+  usersToRender.forEach((user, idx) => {
+    const roleLabel = roleMap[user.role] || user.role;
+    const statusClass = user.status === "active" ? "status-active" : "status-inactive";
+    const statusLabel = user.status === "active" ? "نشط" : "غير نشط";
+
+    const tr = document.createElement("tr");
+    tr.innerHTML = `
+      <td>${user.fullname}</td>
+      <td>${user.email}</td>
+      <td>${user.phone || "-"}</td>
+      <td><span class="role-badge">${roleLabel}</span></td>
+      <td>${user.created_at}</td>
+      <td><span class="status-badge ${statusClass}">${statusLabel}</span></td>
+      <td>
+        <div class="user-actions">
+          <button type="button" class="btn-edit" onclick="editUser(${idx})">تعديل</button>
+          <button type="button" class="btn-permissions" onclick="editPermissions(${idx})">الصلاحيات</button>
+          <button type="button" class="btn-delete" onclick="deleteUser(${idx})">حذف</button>
+        </div>
+      </td>
+    `;
+    tbody.appendChild(tr);
+  });
+}
+
+function updateUserStats() {
+  const total = users.length;
+  const active = users.filter(u => u.status === "active").length;
+  const inactive = users.filter(u => u.status === "inactive").length;
+
+  document.getElementById("stat-total").textContent = total;
+  document.getElementById("stat-active").textContent = active;
+  document.getElementById("stat-inactive").textContent = inactive;
+}
+
+function editUser(idx) {
+  const user = users[idx];
+  if (!user) return;
+
+  const form = document.getElementById("form-user");
+  form.fullname.value = user.fullname;
+  form.email.value = user.email;
+  form.phone.value = user.phone;
+  form.username.value = user.username;
+  form.role.value = user.role;
+  form.status.value = user.status;
+
+  // تحديث الصلاحيات
+  const permissionInputs = form.querySelectorAll("input[name^='perm_']");
+  permissionInputs.forEach(input => {
+    input.checked = user.permissions[input.name] || false;
+  });
+
+  form.setAttribute("data-edit-id", user.id);
+  form.password.value = "";
+  form.confirm_password.value = "";
+  form.password.placeholder = "اتركه فارغاً لعدم تغيير كلمة المرور";
+  form.confirm_password.placeholder = "اتركه فارغاً لعدم تغيير كلمة المرور";
+
+  window.scrollTo({ top: 0, behavior: "smooth" });
+}
+
+function deleteUser(idx) {
+  const user = users[idx];
+  if (!user) return;
+
+  if (!confirm(`هل تريد حذف الموظف: ${user.fullname} ؟`)) return;
+
+  users.splice(idx, 1);
+  saveUsers();
+  renderUsers();
+  updateUserStats();
+}
+
+function editPermissions(idx) {
+  const user = users[idx];
+  if (!user) return;
+
+  alert("✏️ يمكنك تعديل الصلاحيات من خلال زر التعديل أعلاه");
+  editUser(idx);
+}
+
+// ================== صفحة التقارير ==================
+let reportFilters = {
+  search: "",
+  reportType: "",
+  account: "",
+  college: "",
+  program: "",
+  fromDate: null,
+  toDate: null
+};
+
+function initReportsPage() {
+  const btnApplyFilters = document.getElementById("btn-apply-filters");
+  const btnClearFilters = document.getElementById("btn-clear-filters");
+  const btnExportPdf = document.getElementById("btn-export-pdf");
+  const btnExportExcel = document.getElementById("btn-export-excel");
+  const filterSearch = document.getElementById("filter-search");
+  const filterReportType = document.getElementById("filter-report-type");
+  const filterAccount = document.getElementById("filter-account");
+  const filterCollege = document.getElementById("filter-college");
+  const filterProgram = document.getElementById("filter-program");
+  const fromDateInput = document.getElementById("filter-from-date");
+  const toDateInput = document.getElementById("filter-to-date");
+
+  if (!btnApplyFilters) return;
+
+  // ملء قائمة الحسابات والكليات والبرامج في الفلترة
+  populateFilterAccounts();
+  populateFilterColleges();
+
+  // عند تغيير الكلية، تحديث البرامج
+  filterCollege.addEventListener("change", () => {
+    populateFilterPrograms(filterCollege.value);
+    filterProgram.value = "";
+  });
+
+  // تطبيق الفلترة
+  btnApplyFilters.addEventListener("click", () => {
+    reportFilters.search = filterSearch.value.trim();
+    reportFilters.reportType = filterReportType.value;
+    reportFilters.account = filterAccount.value;
+    reportFilters.college = filterCollege.value;
+    reportFilters.program = filterProgram.value;
+    reportFilters.fromDate = fromDateInput.value ? new Date(fromDateInput.value) : null;
+    reportFilters.toDate = toDateInput.value ? new Date(toDateInput.value) : null;
+
+    applyReportFilters();
+    showFilterStats();
+  });
+
+  // إعادة تعيين الفلترة
+  btnClearFilters.addEventListener("click", () => {
+    filterSearch.value = "";
+    filterReportType.value = "";
+    filterAccount.value = "";
+    filterCollege.value = "";
+    filterProgram.value = "";
+    fromDateInput.value = "";
+    toDateInput.value = "";
+    populateFilterPrograms("");
+
+    reportFilters = {
+      search: "",
+      reportType: "",
+      account: "",
+      college: "",
+      program: "",
+      fromDate: null,
+      toDate: null
+    };
+
+    document.getElementById("filter-stats").style.display = "none";
+  });
+
+  // تصدير PDF
+  btnExportPdf.addEventListener("click", () => {
+    exportToPDF();
+  });
+
+  // تصدير Excel
+  btnExportExcel.addEventListener("click", () => {
+    exportToExcel();
+  });
+
+  updateReportCounts();
+}
+
+function populateFilterAccounts() {
+  const filterAccount = document.getElementById("filter-account");
+  if (!filterAccount) return;
+
+  // إضافة الحسابات إلى قائمة الفلترة
+  accounts.forEach(acc => {
+    const option = document.createElement("option");
+    option.value = acc.code;
+    option.textContent = `${acc.code} - ${acc.name}`;
+    filterAccount.appendChild(option);
+  });
+}
+
+function populateFilterColleges() {
+  const filterCollege = document.getElementById("filter-college");
+  if (!filterCollege) return;
+
+  // إضافة الكليات إلى قائمة الفلترة
+  Object.keys(collegesData).forEach(college => {
+    const option = document.createElement("option");
+    option.value = college;
+    option.textContent = college;
+    filterCollege.appendChild(option);
+  });
+}
+
+function populateFilterPrograms(college) {
+  const filterProgram = document.getElementById("filter-program");
+  if (!filterProgram) return;
+
+  // حذف البرامج السابقة
+  filterProgram.innerHTML = '<option value="">-- كل البرامج --</option>';
+
+  if (!college) return;
+
+  // إضافة البرامج للكلية المختارة
+  if (collegesData[college]) {
+    collegesData[college].forEach(program => {
+      const option = document.createElement("option");
+      option.value = program;
+      option.textContent = program;
+      filterProgram.appendChild(option);
+    });
+  }
+}
+
+function filterByDateRange(data, fromDate, toDate) {
+  if (!fromDate && !toDate) return data;
+
+  return data.filter(item => {
+    const itemDate = new Date(item.entry_date);
+    if (fromDate && itemDate < fromDate) return false;
+    if (toDate && itemDate > toDate) return false;
+    return true;
+  });
+}
+
+function filterByAccount(entries, accountCode) {
+  if (!accountCode) return entries;
+
+  return entries.filter(entry => {
+    return entry.transactions.some(tr =>
+      tr.debit_account === accountCode || tr.credit_account === accountCode
+    );
+  });
+}
+
+function filterBySearchTerm(data, searchTerm) {
+  if (!searchTerm) return data;
+
+  const lowerSearch = searchTerm.toLowerCase();
+
+  return data.filter(item => {
+    if (item.code) {
+      if (item.code.toLowerCase().includes(lowerSearch)) return true;
+      if (item.name && item.name.toLowerCase().includes(lowerSearch)) return true;
+    }
+    if (item.entry_code && item.entry_code.toLowerCase().includes(lowerSearch)) return true;
+    if (item.description && item.description.toLowerCase().includes(lowerSearch)) return true;
+    return false;
+  });
+}
+
+function filterByCollege(accounts, collegeName) {
+  if (!collegeName) return accounts;
+  return accounts.filter(acc => acc.college === collegeName);
+}
+
+function filterByProgram(accounts, programName) {
+  if (!programName) return accounts;
+  return accounts.filter(acc => acc.program === programName);
+}
+
+function filterEntriesByCollege(entries, collegeName) {
+  if (!collegeName) return entries;
+
+  return entries.filter(entry => {
+    return entry.transactions.some(tr => {
+      const debitAcc = accounts.find(a => a.code === tr.debit_account);
+      const creditAcc = accounts.find(a => a.code === tr.credit_account);
+      return (debitAcc && debitAcc.college === collegeName) || (creditAcc && creditAcc.college === collegeName);
+    });
+  });
+}
+
+function filterEntriesByProgram(entries, programName) {
+  if (!programName) return entries;
+
+  return entries.filter(entry => {
+    return entry.transactions.some(tr => {
+      const debitAcc = accounts.find(a => a.code === tr.debit_account);
+      const creditAcc = accounts.find(a => a.code === tr.credit_account);
+      return (debitAcc && debitAcc.program === programName) || (creditAcc && creditAcc.program === programName);
+    });
+  });
+}
+
+function applyReportFilters() {
+  // اختيار التقرير بناءً على نوع التقرير المحدد
+  if (!reportFilters.reportType || reportFilters.reportType === "accounts") {
+    showAccountsReportFiltered();
+  } else if (reportFilters.reportType === "entries") {
+    showEntriesReportFiltered();
+  } else if (reportFilters.reportType === "ledger") {
+    showLedgerReportFiltered();
+  } else if (reportFilters.reportType === "trial-balance") {
+    showTrialBalanceReportFiltered();
+  }
+}
+
+function showFilterStats() {
+  const statsDiv = document.getElementById("filter-stats");
+  if (!statsDiv) return;
+
+  let totalDebit = 0, totalCredit = 0, resultCount = 0;
+
+  // حساب الإحصائيات بناءً على نوع التقرير
+  if (!reportFilters.reportType || reportFilters.reportType === "entries") {
+    let filteredEntries = entries;
+
+    if (reportFilters.college) {
+      filteredEntries = filterEntriesByCollege(filteredEntries, reportFilters.college);
+    }
+
+    if (reportFilters.program) {
+      filteredEntries = filterEntriesByProgram(filteredEntries, reportFilters.program);
+    }
+
+    if (reportFilters.account) {
+      filteredEntries = filterByAccount(filteredEntries, reportFilters.account);
+    }
+
+    if (reportFilters.fromDate || reportFilters.toDate) {
+      filteredEntries = filterByDateRange(filteredEntries, reportFilters.fromDate, reportFilters.toDate);
+    }
+
+    if (reportFilters.search) {
+      filteredEntries = filterBySearchTerm(filteredEntries, reportFilters.search);
+    }
+
+    resultCount = filteredEntries.length;
+
+    filteredEntries.forEach(entry => {
+      entry.transactions.forEach(tr => {
+        totalDebit += tr.debit_amount || 0;
+        totalCredit += tr.credit_amount || 0;
+      });
+    });
+  } else if (reportFilters.reportType === "accounts") {
+    let filteredAccounts = accounts;
+
+    if (reportFilters.college) {
+      filteredAccounts = filterByCollege(filteredAccounts, reportFilters.college);
+    }
+
+    if (reportFilters.program) {
+      filteredAccounts = filterByProgram(filteredAccounts, reportFilters.program);
+    }
+
+    if (reportFilters.search) {
+      filteredAccounts = filterBySearchTerm(filteredAccounts, reportFilters.search);
+    }
+
+    resultCount = filteredAccounts.length;
+    totalDebit = filteredAccounts.reduce((sum, a) => sum + a.opening_balance, 0);
+  }
+
+  // عرض الإحصائيات
+  document.getElementById("stats-results").textContent = resultCount;
+  document.getElementById("stats-debit").textContent = totalDebit.toFixed(2);
+  document.getElementById("stats-credit").textContent = totalCredit.toFixed(2);
+
+  statsDiv.style.display = "grid";
+}
+
+function updateReportCounts() {
+  document.getElementById("count-accounts").textContent = accounts.length;
+  document.getElementById("count-entries").textContent = entries.length;
+  document.getElementById("count-users").textContent = users.length;
+}
+
+function showAccountsReport() {
+  const container = document.getElementById("report-container");
+  const content = document.getElementById("report-content");
+  document.getElementById("report-title").textContent = "تقرير الحسابات";
+
+  let html = `<table class="report-table">
+    <thead>
+      <tr>
+        <th>رقم الحساب</th>
+        <th>اسم الحساب</th>
+        <th>الرصيد الافتتاحي</th>
+        <th>نوع الرصيد</th>
+      </tr>
+    </thead>
+    <tbody>`;
+
+  accounts.forEach(acc => {
+    html += `<tr>
+      <td>${acc.code}</td>
+      <td>${acc.name}</td>
+      <td>${acc.opening_balance.toFixed(2)}</td>
+      <td>${acc.balance_type}</td>
+    </tr>`;
+  });
+
+  html += `</tbody></table>`;
+
+  // ملخص
+  const totalOpening = accounts.reduce((sum, a) => sum + a.opening_balance, 0);
+  html += `<div class="report-summary">
+    <div class="summary-row">
+      <span class="summary-label">إجمالي الأرصدة الافتتاحية</span>
+      <span class="summary-value">${totalOpening.toFixed(2)}</span>
+    </div>
+    <div class="summary-row">
+      <span class="summary-label">عدد الحسابات</span>
+      <span class="summary-value">${accounts.length}</span>
+    </div>
+  </div>`;
+
+  content.innerHTML = html;
+  container.style.display = "block";
+  container.scrollIntoView({ behavior: "smooth" });
+}
+
+function showAccountsReportFiltered() {
+  const container = document.getElementById("report-container");
+  const content = document.getElementById("report-content");
+  document.getElementById("report-title").textContent = "تقرير الحسابات (مرشح)";
+
+  let filteredAccounts = accounts;
+
+  if (reportFilters.college) {
+    filteredAccounts = filterByCollege(filteredAccounts, reportFilters.college);
+  }
+
+  if (reportFilters.program) {
+    filteredAccounts = filterByProgram(filteredAccounts, reportFilters.program);
+  }
+
+  if (reportFilters.search) {
+    filteredAccounts = filterBySearchTerm(filteredAccounts, reportFilters.search);
+  }
+
+  let html = `<table class="report-table">
+    <thead>
+      <tr>
+        <th>رقم الحساب</th>
+        <th>اسم الحساب</th>
+        <th>الكلية</th>
+        <th>البرنامج</th>
+        <th>الرصيد الافتتاحي</th>
+        <th>نوع الرصيد</th>
+      </tr>
+    </thead>
+    <tbody>`;
+
+  filteredAccounts.forEach(acc => {
+    html += `<tr>
+      <td>${acc.code}</td>
+      <td>${acc.name}</td>
+      <td>${acc.college || "-"}</td>
+      <td>${acc.program || "-"}</td>
+      <td>${acc.opening_balance.toFixed(2)}</td>
+      <td>${acc.balance_type}</td>
+    </tr>`;
+  });
+
+  html += `</tbody></table>`;
+
+  // ملخص
+  const totalOpening = filteredAccounts.reduce((sum, a) => sum + a.opening_balance, 0);
+  html += `<div class="report-summary">
+    <div class="summary-row">
+      <span class="summary-label">إجمالي الأرصدة الافتتاحية</span>
+      <span class="summary-value">${totalOpening.toFixed(2)}</span>
+    </div>
+    <div class="summary-row">
+      <span class="summary-label">عدد الحسابات</span>
+      <span class="summary-value">${filteredAccounts.length}</span>
+    </div>
+  </div>`;
+
+  content.innerHTML = html;
+  container.style.display = "block";
+  container.scrollIntoView({ behavior: "smooth" });
+}
+
+function showEntriesReport() {
+  const container = document.getElementById("report-container");
+  const content = document.getElementById("report-content");
+  document.getElementById("report-title").textContent = "تقرير القيود";
+
+  let html = `<table class="report-table">
+    <thead>
+      <tr>
+        <th>التاريخ</th>
+        <th>رقم القيد</th>
+        <th>الحساب المدين</th>
+        <th>المبلغ المدين</th>
+        <th>الحساب الدائن</th>
+        <th>المبلغ الدائن</th>
+        <th>البيان</th>
+      </tr>
+    </thead>
+    <tbody>`;
+
+  let totalDebit = 0, totalCredit = 0;
+
+  entries.forEach(entry => {
+    entry.transactions.forEach(tr => {
+      const debitAcc = accounts.find(a => a.code === tr.debit_account);
+      const creditAcc = accounts.find(a => a.code === tr.credit_account);
+      const debitAmt = tr.debit_amount || 0;
+      const creditAmt = tr.credit_amount || 0;
+
+      totalDebit += debitAmt;
+      totalCredit += creditAmt;
+
+      html += `<tr>
+        <td>${entry.entry_date}</td>
+        <td>${entry.entry_code}</td>
+        <td>${debitAcc ? debitAcc.name : tr.debit_account}</td>
+        <td>${debitAmt.toFixed(2)}</td>
+        <td>${creditAcc ? creditAcc.name : tr.credit_account}</td>
+        <td>${creditAmt.toFixed(2)}</td>
+        <td>${tr.description}</td>
+      </tr>`;
+    });
+  });
+
+  html += `</tbody></table>`;
+
+  // ملخص
+  html += `<div class="report-summary">
+    <div class="summary-row">
+      <span class="summary-label">إجمالي المدين</span>
+      <span class="summary-value">${totalDebit.toFixed(2)}</span>
+    </div>
+    <div class="summary-row">
+      <span class="summary-label">إجمالي الدائن</span>
+      <span class="summary-value">${totalCredit.toFixed(2)}</span>
+    </div>
+    <div class="summary-row">
+      <span class="summary-label">عدد القيود</span>
+      <span class="summary-value">${entries.length}</span>
+    </div>
+  </div>`;
+
+  content.innerHTML = html;
+  container.style.display = "block";
+  container.scrollIntoView({ behavior: "smooth" });
+}
+
+function showEntriesReportFiltered() {
+  const container = document.getElementById("report-container");
+  const content = document.getElementById("report-content");
+  document.getElementById("report-title").textContent = "تقرير القيود (مرشح)";
+
+  let filteredEntries = entries;
+
+  if (reportFilters.college) {
+    filteredEntries = filterEntriesByCollege(filteredEntries, reportFilters.college);
+  }
+
+  if (reportFilters.program) {
+    filteredEntries = filterEntriesByProgram(filteredEntries, reportFilters.program);
+  }
+
+  if (reportFilters.account) {
+    filteredEntries = filterByAccount(filteredEntries, reportFilters.account);
+  }
+
+  if (reportFilters.fromDate || reportFilters.toDate) {
+    filteredEntries = filterByDateRange(filteredEntries, reportFilters.fromDate, reportFilters.toDate);
+  }
+
+  if (reportFilters.search) {
+    filteredEntries = filterBySearchTerm(filteredEntries, reportFilters.search);
+  }
+
+  let html = `<table class="report-table">
+    <thead>
+      <tr>
+        <th>التاريخ</th>
+        <th>رقم القيد</th>
+        <th>الحساب المدين</th>
+        <th>المبلغ المدين</th>
+        <th>الحساب الدائن</th>
+        <th>المبلغ الدائن</th>
+        <th>البيان</th>
+      </tr>
+    </thead>
+    <tbody>`;
+
+  let totalDebit = 0, totalCredit = 0;
+
+  filteredEntries.forEach(entry => {
+    entry.transactions.forEach(tr => {
+      const debitAcc = accounts.find(a => a.code === tr.debit_account);
+      const creditAcc = accounts.find(a => a.code === tr.credit_account);
+      const debitAmt = tr.debit_amount || 0;
+      const creditAmt = tr.credit_amount || 0;
+
+      totalDebit += debitAmt;
+      totalCredit += creditAmt;
+
+      html += `<tr>
+        <td>${entry.entry_date}</td>
+        <td>${entry.entry_code}</td>
+        <td>${debitAcc ? debitAcc.name : tr.debit_account}</td>
+        <td>${debitAmt.toFixed(2)}</td>
+        <td>${creditAcc ? creditAcc.name : tr.credit_account}</td>
+        <td>${creditAmt.toFixed(2)}</td>
+        <td>${tr.description}</td>
+      </tr>`;
+    });
+  });
+
+  html += `</tbody></table>`;
+
+  // ملخص
+  html += `<div class="report-summary">
+    <div class="summary-row">
+      <span class="summary-label">إجمالي المدين</span>
+      <span class="summary-value">${totalDebit.toFixed(2)}</span>
+    </div>
+    <div class="summary-row">
+      <span class="summary-label">إجمالي الدائن</span>
+      <span class="summary-value">${totalCredit.toFixed(2)}</span>
+    </div>
+    <div class="summary-row">
+      <span class="summary-label">عدد القيود</span>
+      <span class="summary-value">${filteredEntries.length}</span>
+    </div>
+  </div>`;
+
+  content.innerHTML = html;
+  container.style.display = "block";
+  container.scrollIntoView({ behavior: "smooth" });
+}
+
+function showUsersReport() {
+  const container = document.getElementById("report-container");
+  const content = document.getElementById("report-content");
+  document.getElementById("report-title").textContent = "تقرير الموظفين";
+
+  const roleMap = {
+    "super_admin": "مدير النظام",
+    "manager": "مدير",
+    "accountant": "محاسب",
+    "viewer": "مشاهد فقط"
+  };
+
+  let html = `<table class="report-table">
+    <thead>
+      <tr>
+        <th>الاسم</th>
+        <th>البريد الإلكتروني</th>
+        <th>اسم المستخدم</th>
+        <th>الدور</th>
+        <th>الحالة</th>
+        <th>تاريخ الإنشاء</th>
+      </tr>
+    </thead>
+    <tbody>`;
+
+  users.forEach(user => {
+    const roleLabel = roleMap[user.role] || user.role;
+    const statusLabel = user.status === "active" ? "نشط" : "غير نشط";
+
+    html += `<tr>
+      <td>${user.fullname}</td>
+      <td>${user.email}</td>
+      <td>${user.username}</td>
+      <td>${roleLabel}</td>
+      <td>${statusLabel}</td>
+      <td>${user.created_at}</td>
+    </tr>`;
+  });
+
+  html += `</tbody></table>`;
+
+  // ملخص
+  const activeUsers = users.filter(u => u.status === "active").length;
+  html += `<div class="report-summary">
+    <div class="summary-row">
+      <span class="summary-label">إجمالي الموظفين</span>
+      <span class="summary-value">${users.length}</span>
+    </div>
+    <div class="summary-row">
+      <span class="summary-label">الموظفون النشطون</span>
+      <span class="summary-value">${activeUsers}</span>
+    </div>
+    <div class="summary-row">
+      <span class="summary-label">الموظفون غير النشطين</span>
+      <span class="summary-value">${users.length - activeUsers}</span>
+    </div>
+  </div>`;
+
+  content.innerHTML = html;
+  container.style.display = "block";
+  container.scrollIntoView({ behavior: "smooth" });
+}
+
+function showFinancialSummary() {
+  const container = document.getElementById("report-container");
+  const content = document.getElementById("report-content");
+  document.getElementById("report-title").textContent = "الملخص المالي";
+
+  let totalDebit = 0, totalCredit = 0, totalAccounts = 0;
+
+  entries.forEach(entry => {
+    entry.transactions.forEach(tr => {
+      const debitAmt = tr.debit_amount || 0;
+      const creditAmt = tr.credit_amount || 0;
+      totalDebit += debitAmt;
+      totalCredit += creditAmt;
+    });
+  });
+
+  const totalOpening = accounts.reduce((sum, a) => sum + a.opening_balance, 0);
+
+  let html = `<div class="report-summary">
+    <div class="summary-row">
+      <span class="summary-label">إجمالي الأرصدة الافتتاحية</span>
+      <span class="summary-value">${totalOpening.toFixed(2)}</span>
+    </div>
+    <div class="summary-row">
+      <span class="summary-label">إجمالي الحسابات</span>
+      <span class="summary-value">${accounts.length}</span>
+    </div>
+    <div class="summary-row">
+      <span class="summary-label">إجمالي المدين من القيود</span>
+      <span class="summary-value">${totalDebit.toFixed(2)}</span>
+    </div>
+    <div class="summary-row">
+      <span class="summary-label">إجمالي الدائن من القيود</span>
+      <span class="summary-value">${totalCredit.toFixed(2)}</span>
+    </div>
+    <div class="summary-row">
+      <span class="summary-label">عدد القيود المسجلة</span>
+      <span class="summary-value">${entries.length}</span>
+    </div>
+    <div class="summary-row">
+      <span class="summary-label">عدد الموظفين</span>
+      <span class="summary-value">${users.length}</span>
+    </div>
+  </div>`;
+
+  content.innerHTML = html;
+  container.style.display = "block";
+  container.scrollIntoView({ behavior: "smooth" });
+}
+
+function showDailyMovementsReport() {
+  const container = document.getElementById("report-container");
+  const content = document.getElementById("report-content");
+  document.getElementById("report-title").textContent = "تقرير الحركات اليومية";
+
+  const dailyData = {};
+
+  entries.forEach(entry => {
+    const date = entry.entry_date;
+    if (!dailyData[date]) {
+      dailyData[date] = { debit: 0, credit: 0, count: 0 };
+    }
+
+    entry.transactions.forEach(tr => {
+      const debitAmt = tr.debit_amount || 0;
+      const creditAmt = tr.credit_amount || 0;
+      dailyData[date].debit += debitAmt;
+      dailyData[date].credit += creditAmt;
+      dailyData[date].count += 1;
+    });
+  });
+
+  let html = `<table class="report-table">
+    <thead>
+      <tr>
+        <th>التاريخ</th>
+        <th>المدين</th>
+        <th>الدائن</th>
+        <th>عدد العمليات</th>
+      </tr>
+    </thead>
+    <tbody>`;
+
+  Object.keys(dailyData).sort().reverse().forEach(date => {
+    const data = dailyData[date];
+    html += `<tr>
+      <td>${date}</td>
+      <td>${data.debit.toFixed(2)}</td>
+      <td>${data.credit.toFixed(2)}</td>
+      <td>${data.count}</td>
+    </tr>`;
+  });
+
+  html += `</tbody></table>`;
+
+  content.innerHTML = html;
+  container.style.display = "block";
+  container.scrollIntoView({ behavior: "smooth" });
+}
+
+function showActivityLog() {
+  const container = document.getElementById("report-container");
+  const content = document.getElementById("report-content");
+  document.getElementById("report-title").textContent = "سجل الأنشطة";
+
+  let html = `<p style="color: var(--muted); font-size: 13px; text-align: center;">
+    📝 سجل الأنشطة يتابع جميع العمليات والتعديلات على النظام
+  </p>
+  <div class="report-summary">
+    <div class="summary-row">
+      <span class="summary-label">إجمالي الحسابات المسجلة</span>
+      <span class="summary-value">${accounts.length}</span>
+    </div>
+    <div class="summary-row">
+      <span class="summary-label">إجمالي القيود المسجلة</span>
+      <span class="summary-value">${entries.length}</span>
+    </div>
+    <div class="summary-row">
+      <span class="summary-label">إجمالي الموظفين المسجلين</span>
+      <span class="summary-value">${users.length}</span>
+    </div>
+  </div>`;
+
+  content.innerHTML = html;
+  container.style.display = "block";
+  container.scrollIntoView({ behavior: "smooth" });
+}
+
+function showLedgerReportFiltered() {
+  const container = document.getElementById("report-container");
+  const content = document.getElementById("report-content");
+  document.getElementById("report-title").textContent = "تقرير دفتر الأستاذ (مرشح)";
+
+  let filteredEntries = entries;
+
+  if (reportFilters.fromDate || reportFilters.toDate) {
+    filteredEntries = filterByDateRange(filteredEntries, reportFilters.fromDate, reportFilters.toDate);
+  }
+
+  let html = `<table class="report-table">
+    <thead>
+      <tr>
+        <th>رقم الحساب</th>
+        <th>اسم الحساب</th>
+        <th>الرصيد الافتتاحي</th>
+        <th>المدين</th>
+        <th>الدائن</th>
+        <th>الرصيد النهائي</th>
+        <th>نوع الرصيد</th>
+      </tr>
+    </thead>
+    <tbody>`;
+
+  accounts.forEach(acc => {
+    let debit = 0;
+    let credit = 0;
+
+    filteredEntries.forEach(entry => {
+      (entry.transactions || []).forEach(tr => {
+        const debitAmt = tr.debit_amount !== undefined ? tr.debit_amount : (tr.amount || 0);
+        const creditAmt = tr.credit_amount !== undefined ? tr.credit_amount : (tr.amount || 0);
+
+        if (tr.debit_account === acc.code) debit += debitAmt;
+        if (tr.credit_account === acc.code) credit += creditAmt;
+      });
+    });
+
+    const openingSigned = acc.balance_type === "دائن"
+      ? -acc.opening_balance
+      : acc.opening_balance;
+
+    const finalBalance = openingSigned + debit - credit;
+
+    html += `<tr>
+      <td>${acc.code}</td>
+      <td>${acc.name}</td>
+      <td>${acc.opening_balance.toFixed(2)}</td>
+      <td>${debit.toFixed(2)}</td>
+      <td>${credit.toFixed(2)}</td>
+      <td>${finalBalance.toFixed(2)}</td>
+      <td>${acc.balance_type}</td>
+    </tr>`;
+  });
+
+  html += `</tbody></table>`;
+
+  html += `<div class="report-summary">
+    <div class="summary-row">
+      <span class="summary-label">عدد الحسابات</span>
+      <span class="summary-value">${accounts.length}</span>
+    </div>
+    <div class="summary-row">
+      <span class="summary-label">الفترة الزمنية</span>
+      <span class="summary-value">
+        ${reportFilters.fromDate ? reportFilters.fromDate.toLocaleDateString("ar-EG") : "من البداية"}
+        إلى
+        ${reportFilters.toDate ? reportFilters.toDate.toLocaleDateString("ar-EG") : "إلى النهاية"}
+      </span>
+    </div>
+  </div>`;
+
+  content.innerHTML = html;
+  container.style.display = "block";
+  container.scrollIntoView({ behavior: "smooth" });
+}
+
+function showTrialBalanceReportFiltered() {
+  const container = document.getElementById("report-container");
+  const content = document.getElementById("report-content");
+  document.getElementById("report-title").textContent = "تقرير ميزان المراجعة (مرشح)";
+
+  let filteredEntries = entries;
+
+  if (reportFilters.fromDate || reportFilters.toDate) {
+    filteredEntries = filterByDateRange(filteredEntries, reportFilters.fromDate, reportFilters.toDate);
+  }
+
+  let html = `<table class="report-table">
+    <thead>
+      <tr>
+        <th>اسم الحساب</th>
+        <th>الرصيد الافتتاحي مدين</th>
+        <th>الرصيد الافتتاحي دائن</th>
+        <th>المدين</th>
+        <th>الدائن</th>
+        <th>المجموع المدين</th>
+        <th>المجموع الدائن</th>
+        <th>الرصيد النهائي مدين</th>
+        <th>الرصيد النهائي دائن</th>
+      </tr>
+    </thead>
+    <tbody>`;
+
+  let totalDebitOpen = 0, totalCreditOpen = 0;
+  let totalDebitPeriod = 0, totalCreditPeriod = 0;
+  let totalDebitFinal = 0, totalCreditFinal = 0;
+
+  accounts.forEach(acc => {
+    let debit = 0;
+    let credit = 0;
+
+    filteredEntries.forEach(entry => {
+      (entry.transactions || []).forEach(tr => {
+        const debitAmt = tr.debit_amount !== undefined ? tr.debit_amount : (tr.amount || 0);
+        const creditAmt = tr.credit_amount !== undefined ? tr.credit_amount : (tr.amount || 0);
+
+        if (tr.debit_account === acc.code) debit += debitAmt;
+        if (tr.credit_account === acc.code) credit += creditAmt;
+      });
+    });
+
+    let openingSigned = acc.opening_balance;
+    if (acc.balance_type === "دائن") {
+      openingSigned = -openingSigned;
+    }
+
+    const opening_d = openingSigned > 0 ? openingSigned : 0;
+    const opening_c = openingSigned < 0 ? Math.abs(openingSigned) : 0;
+
+    const total_d = opening_d + debit;
+    const total_c = opening_c + credit;
+
+    const final = openingSigned + debit - credit;
+    const final_d = final > 0 ? final : 0;
+    const final_c = final < 0 ? Math.abs(final) : 0;
+
+    totalDebitOpen += opening_d;
+    totalCreditOpen += opening_c;
+    totalDebitPeriod += debit;
+    totalCreditPeriod += credit;
+    totalDebitFinal += final_d;
+    totalCreditFinal += final_c;
+
+    html += `<tr>
+      <td>${acc.name}</td>
+      <td>${opening_d.toFixed(2)}</td>
+      <td>${opening_c.toFixed(2)}</td>
+      <td>${debit.toFixed(2)}</td>
+      <td>${credit.toFixed(2)}</td>
+      <td>${total_d.toFixed(2)}</td>
+      <td>${total_c.toFixed(2)}</td>
+      <td>${final_d.toFixed(2)}</td>
+      <td>${final_c.toFixed(2)}</td>
+    </tr>`;
+  });
+
+  html += `</tbody></table>`;
+
+  html += `<div class="report-summary">
+    <div class="summary-row">
+      <span class="summary-label">إجمالي الرصيد الافتتاحي مدين</span>
+      <span class="summary-value">${totalDebitOpen.toFixed(2)}</span>
+    </div>
+    <div class="summary-row">
+      <span class="summary-label">إجمالي الرصيد الافتتاحي دائن</span>
+      <span class="summary-value">${totalCreditOpen.toFixed(2)}</span>
+    </div>
+    <div class="summary-row">
+      <span class="summary-label">إجمالي المدين في الفترة</span>
+      <span class="summary-value">${totalDebitPeriod.toFixed(2)}</span>
+    </div>
+    <div class="summary-row">
+      <span class="summary-label">إجمالي الدائن في الفترة</span>
+      <span class="summary-value">${totalCreditPeriod.toFixed(2)}</span>
+    </div>
+    <div class="summary-row">
+      <span class="summary-label">إجمالي الرصيد النهائي مدين</span>
+      <span class="summary-value">${totalDebitFinal.toFixed(2)}</span>
+    </div>
+    <div class="summary-row">
+      <span class="summary-label">إجمالي الرصيد النهائي دائن</span>
+      <span class="summary-value">${totalCreditFinal.toFixed(2)}</span>
+    </div>
+    <div class="summary-row">
+      <span class="summary-label">الفترة الزمنية</span>
+      <span class="summary-value">
+        ${reportFilters.fromDate ? reportFilters.fromDate.toLocaleDateString("ar-EG") : "من البداية"}
+        إلى
+        ${reportFilters.toDate ? reportFilters.toDate.toLocaleDateString("ar-EG") : "إلى النهاية"}
+      </span>
+    </div>
+  </div>`;
+
+  content.innerHTML = html;
+  container.style.display = "block";
+  container.scrollIntoView({ behavior: "smooth" });
+}
+
+function closeReport() {
+  const container = document.getElementById("report-container");
+  container.style.display = "none";
+}
+
+// ================== دوال التصدير إلى PDF و Excel ==================
+
+function exportToPDF() {
+  const reportTitle = document.getElementById("report-title");
+  const reportContent = document.getElementById("report-content");
+
+  if (!reportTitle || !reportContent || reportContent.innerHTML.trim() === "") {
+    alert("❌ لا يوجد تقرير لتصديره. يرجى تطبيق الفلترة أولاً.");
+    return;
+  }
+
+  try {
+    const jsPDF = window.jspdf.jsPDF;
+    const doc = new jsPDF({
+      orientation: "landscape",
+      unit: "mm",
+      format: "a4"
+    });
+
+    // إضافة العنوان
+    doc.setFont("helvetica", "bold");
+    doc.setFontSize(16);
+    doc.text(reportTitle.textContent, doc.internal.pageSize.getWidth() / 2, 15, { align: "center" });
+
+    // إضافة التاريخ
+    doc.setFont("helvetica", "normal");
+    doc.setFontSize(10);
+    const now = new Date().toLocaleDateString("ar-SA");
+    doc.text(`التاريخ: ${now}`, doc.internal.pageSize.getWidth() / 2, 22, { align: "center" });
+
+    // استخراج البيانات من الجدول
+    const table = reportContent.querySelector("table");
+    if (table) {
+      const rows = [];
+
+      // استخراج رؤوس الجدول
+      const headers = [];
+      table.querySelectorAll("thead th").forEach(th => {
+        headers.push(th.textContent.trim());
+      });
+      rows.push(headers);
+
+      // استخراج صفوف البيانات
+      table.querySelectorAll("tbody tr").forEach(tr => {
+        const row = [];
+        tr.querySelectorAll("td").forEach(td => {
+          row.push(td.textContent.trim());
+        });
+        rows.push(row);
+      });
+
+      // إضافة الجدول إلى PDF
+      if (rows.length > 1) {
+        doc.autoTable({
+          head: [rows[0]],
+          body: rows.slice(1),
+          startY: 30,
+          margin: { top: 35, right: 10, bottom: 10, left: 10 },
+          styles: {
+            font: "helvetica",
+            fontSize: 8,
+            halign: "center",
+            valign: "middle",
+            cellPadding: 3,
+            lineColor: [200, 200, 200]
+          },
+          headStyles: {
+            fillColor: [70, 130, 180],
+            textColor: 255,
+            fontStyle: "bold",
+            halign: "center"
+          },
+          bodyStyles: {
+            textColor: 0
+          }
+        });
+      }
+    }
+
+    // حفظ الملف
+    const fileName = `Report_${new Date().getTime()}.pdf`;
+    doc.save(fileName);
+    alert("✅ تم تصدير التقرير إلى PDF بنجاح");
+  } catch (error) {
+    console.error("خطأ في التصدير:", error);
+    alert("❌ حدث خطأ أثناء التصدير: " + error.message);
+  }
+}
+
+function exportToExcel() {
+  const reportTitle = document.getElementById("report-title");
+  const reportContent = document.getElementById("report-content");
+
+  if (!reportTitle || !reportContent || reportContent.innerHTML.trim() === "") {
+    alert("❌ لا يوجد تقرير لتصديره. يرجى تطبيق الفلترة أولاً.");
+    return;
+  }
+
+  try {
+    const table = reportContent.querySelector("table");
+    if (!table) {
+      alert("❌ لا يوجد جدول بيانات لتصديره.");
+      return;
+    }
+
+    // استخراج البيانات من الجدول
+    const headers = [];
+
+    // استخراج رؤوس الجدول
+    table.querySelectorAll("thead th").forEach(th => {
+      headers.push(th.textContent.trim());
+    });
+
+    const dataRows = [];
+
+    // استخراج صفوف البيانات
+    table.querySelectorAll("tbody tr").forEach(tr => {
+      const row = [];
+      tr.querySelectorAll("td").forEach(td => {
+        row.push(td.textContent.trim());
+      });
+      dataRows.push(row);
+    });
+
+    // إنشاء مصنف Excel
+    const workbook = XLSX.utils.book_new();
+
+    // إضافة ورقة البيانات
+    const worksheetData = [
+      [reportTitle.textContent],
+      [`التاريخ: ${new Date().toLocaleDateString("ar-SA")}`],
+      [],
+      headers,
+      ...dataRows
+    ];
+
+    const worksheet = XLSX.utils.aoa_to_sheet(worksheetData);
+
+    // تعيين عرض الأعمدة
+    const colWidths = headers.map(() => 20);
+    worksheet["!cols"] = colWidths;
+
+    XLSX.utils.book_append_sheet(workbook, worksheet, "التقرير");
+
+    // حفظ الملف
+    const fileName = `تقرير_${reportTitle.textContent}_${new Date().getTime()}.xlsx`;
+    XLSX.writeFile(workbook, fileName);
+    alert("✅ تم تصدير التقرير إلى Excel بنجاح");
+  } catch (error) {
+    console.error("خطأ في التصدير:", error);
+    alert("❌ حدث خطأ أثناء التصدير: " + error.message);
+  }
+}
+
+// ================== تهيئة الصفحات ==================
 document.addEventListener("DOMContentLoaded", () => {
-  renderAccounts();
-  renderEntries();
-  showPage("section-accounts");
+  if (document.getElementById("form-account"))       initAccountsPage();
+  if (document.getElementById("form-entry"))         initEntriesPage();
+  if (document.getElementById("tbl-ledger"))         initLedgerPage();
+  if (document.getElementById("tbl-trial"))          initTrialBalancePage();
+  if (document.getElementById("generate-financial")) initFinancialPositionPage();
+  if (document.getElementById("generate-report-is")) initIncomeStatementPage();
+  if (document.getElementById("form-user"))          initUsersPage();
+  if (document.getElementById("btn-apply-filters"))  initReportsPage();
 });

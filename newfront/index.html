@@ -19,12 +19,11 @@
         <a href="entries.html" class="nav-link">إضافة قيد</a>
         <a href="ledger.html" class="nav-link">دفتر الأستاذ</a>
         <a href="trial-balance.html" class="nav-link">ميزان المراجعة</a>
-        <a href="financial-position.html" class="nav-link"
-          >قائمة المركز المالي</a
-        >
+        <a href="financial-position.html" class="nav-link">قائمة المركز المالي</a>
+        <a href="income-statement.html" class="nav-link">قائمة الدخل</a>
+        <a href="reports.html" class="nav-link">التقارير</a>
         <a href="users.html" class="nav-link">المستخدمين</a>
         <a href="year-settings.html" class="nav-link">السنة المالية</a>
-        <a href="journal.html" class="nav-link">دفتر اليومية</a>
       </nav>
     </header>
 
@@ -55,7 +54,23 @@
                 <option value="دائن">دائن</option>
               </select>
             </label>
+            <label>نوع التقرير
+              <select name="report_type" id="report_type">
+                <option value="financial">قائمة المركز المالي</option>
+                <option value="income">قائمة الدخل</option>
+              </select>
+            </label>
+
+            <label>نوع حساب قائمة الدخل
+              <select name="income_type" id="income_type">
+                <option value="">لا ينطبق / بدون</option>
+                <option value="revenue">إيراد</option>
+                <option value="expense">مصروف</option>
+              </select>
+            </label>
+
           </div>
+
           <button type="submit" class="primary">💾 حفظ الحساب</button>
         </form>
 

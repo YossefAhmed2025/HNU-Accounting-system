@@ -1,0 +1,143 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>التقارير - النظام المحاسبي</title>
+    <link rel="icon" type="image/png" href="logo.png" />
+    <link rel="stylesheet" href="styles.css" />
+  </head>
+  <body>
+    <header class="topbar">
+      <div class="brand">
+        <img src="logo.png" alt="HNU logo" class="brand-logo" />
+        <span class="brand-text">HNU — النظام المحاسبي</span>
+      </div>
+      <nav class="nav">
+        <a href="index.html" class="nav-link">إضافة حساب</a>
+        <a href="entries.html" class="nav-link">إضافة قيد</a>
+        <a href="ledger.html" class="nav-link">دفتر الأستاذ</a>
+        <a href="trial-balance.html" class="nav-link">ميزان المراجعة</a>
+        <a href="financial-position.html" class="nav-link">قائمة المركز المالي</a>
+        <a href="income-statement.html" class="nav-link">قائمة الدخل</a>
+        <a href="reports.html" class="nav-link active">التقارير</a>
+        <a href="users.html" class="nav-link">المستخدمين</a>
+        <a href="year-settings.html" class="nav-link">السنة المالية</a>
+      </nav>
+    </header>
+
+    <main class="container">
+      <section id="section-reports" class="page active">
+        <h2>التقارير والإحصائيات</h2>
+
+        <!-- خيارات الفلترة المتقدمة -->
+        <div class="reports-filters card">
+          <h3>🔍 خيارات البحث والفلترة المتقدمة</h3>
+
+          <div class="filter-controls">
+            <!-- البحث العام -->
+            <div class="search-group">
+              <label>
+                بحث عام
+                <input
+                  type="text"
+                  id="filter-search"
+                  placeholder="ابحث عن حساب أو قيد أو موظف..."
+                />
+              </label>
+            </div>
+
+            <!-- نوع التقرير -->
+            <div class="filter-group">
+              <label>
+                نوع التقرير
+                <select id="filter-report-type">
+                  <option value="">-- كل التقارير --</option>
+                  <option value="ledger">دفتر الأستاذ</option>
+                  <option value="trial-balance">ميزان المراجعة</option>
+                  <option value="entries">القيود</option>
+                  <option value="accounts">الحسابات</option>
+                </select>
+              </label>
+
+              <label>
+                حساب معين
+                <select id="filter-account">
+                  <option value="">-- كل الحسابات --</option>
+                </select>
+              </label>
+            </div>
+
+            <!-- الفلترة حسب الكلية والبرنامج -->
+            <div class="filter-group">
+              <label>
+                الكلية
+                <select id="filter-college">
+                  <option value="">-- كل الكليات --</option>
+                </select>
+              </label>
+
+              <label>
+                البرنامج
+                <select id="filter-program">
+                  <option value="">-- كل البرامج --</option>
+                </select>
+              </label>
+            </div>
+
+            <!-- الفلترة حسب التاريخ -->
+            <div class="filter-group">
+              <label>
+                من التاريخ
+                <input type="date" id="filter-from-date" />
+              </label>
+              <label>
+                إلى التاريخ
+                <input type="date" id="filter-to-date" />
+              </label>
+            </div>
+
+            <!-- أزرار الإجراءات -->
+            <div class="filter-actions">
+              <button type="button" class="primary" id="btn-apply-filters">🔍 تطبيق الفلترة</button>
+              <button type="button" class="primary" id="btn-clear-filters" style="background: linear-gradient(90deg, #6366f1, #8b5cf6);">🔄 إعادة تعيين</button>
+              <button type="button" class="primary" id="btn-export-pdf" style="background: linear-gradient(90deg, #ef4444, #dc2626);">📥 تصدير PDF</button>
+              <button type="button" class="primary" id="btn-export-excel" style="background: linear-gradient(90deg, #10b981, #059669);">📊 تصدير Excel</button>
+            </div>
+          </div>
+
+          <!-- إحصائيات الفلترة -->
+          <div class="filter-stats" id="filter-stats" style="display: none;">
+            <div class="stat-item">
+              <span class="stat-label">النتائج:</span>
+              <span class="stat-value" id="stats-results">0</span>
+            </div>
+            <div class="stat-item">
+              <span class="stat-label">إجمالي المدين:</span>
+              <span class="stat-value" id="stats-debit">0.00</span>
+            </div>
+            <div class="stat-item">
+              <span class="stat-label">إجمالي الدائن:</span>
+              <span class="stat-value" id="stats-credit">0.00</span>
+            </div>
+          </div>
+        </div>
+
+        <!-- جدول التقرير الديناميكي -->
+        <div id="report-container" class="card" style="display: none; margin-top: 30px;">
+          <div class="report-toolbar">
+            <h3 id="report-title">التقرير</h3>
+            <button type="button" class="btn-close-report" onclick="closeReport()">✕ إغلاق</button>
+          </div>
+          <div id="report-content"></div>
+        </div>
+      </section>
+    </main>
+
+    <!-- Libraries for PDF and Excel export -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf-autotable/3.5.31/jspdf.plugin.autotable.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/xlsx@0.18.5/dist/xlsx.full.min.js"></script>
+    <script src="main.js"></script>
+  </body>
+</html>

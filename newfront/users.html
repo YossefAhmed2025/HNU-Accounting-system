@@ -19,31 +19,158 @@
         <a href="entries.html" class="nav-link">إضافة قيد</a>
         <a href="ledger.html" class="nav-link">دفتر الأستاذ</a>
         <a href="trial-balance.html" class="nav-link">ميزان المراجعة</a>
-        <a href="financial-position.html" class="nav-link"
-          >قائمة المركز المالي</a
-        >
+        <a href="financial-position.html" class="nav-link">قائمة المركز المالي</a>
+        <a href="income-statement.html" class="nav-link">قائمة الدخل</a>
+        <a href="reports.html" class="nav-link">التقارير</a>
         <a href="users.html" class="nav-link active">المستخدمين</a>
         <a href="year-settings.html" class="nav-link">السنة المالية</a>
-        <a href="journal.html" class="nav-link">دفتر اليومية</a>
       </nav>
     </header>
 
     <main class="container">
-      <section id="section-users-list" class="page active">
-        <h2>قائمة المستخدمين</h2>
+      <!-- إضافة موظف جديد -->
+      <section id="section-add-user" class="page active">
+        <h2>إضافة موظف جديد</h2>
+        <form id="form-user" class="card">
+          <div class="form-grid">
+            <label>
+              الاسم الكامل
+              <input type="text" name="fullname" placeholder="أدخل الاسم الكامل" required />
+            </label>
+            <label>
+              البريد الإلكتروني
+              <input type="email" name="email" placeholder="example@hnu.edu.sa" required />
+            </label>
+            <label>
+              رقم الهاتف
+              <input type="tel" name="phone" placeholder="رقم الهاتف" />
+            </label>
+            <label>
+              اسم المستخدم
+              <input type="text" name="username" placeholder="اسم فريد للدخول" required />
+            </label>
+            <label>
+              كلمة المرور
+              <input type="password" name="password" placeholder="كلمة مرور قوية" required />
+            </label>
+            <label>
+              تأكيد كلمة المرور
+              <input type="password" name="confirm_password" placeholder="أعد إدخال كلمة المرور" required />
+            </label>
+            <label>
+              الدور الوظيفي
+              <select name="role" required>
+                <option value="">-- اختر الدور --</option>
+                <option value="super_admin">مدير النظام</option>
+                <option value="manager">مدير</option>
+                <option value="accountant">محاسب</option>
+                <option value="viewer">مشاهد فقط</option>
+              </select>
+            </label>
+            <label>
+              الحالة
+              <select name="status" required>
+                <option value="active">نشط</option>
+                <option value="inactive">غير نشط</option>
+              </select>
+            </label>
+          </div>
+
+          <!-- الصلاحيات -->
+          <div class="permissions-section">
+            <h3>الصلاحيات</h3>
+            <div class="permissions-grid">
+              <label class="permission-checkbox">
+                <input type="checkbox" name="perm_view_accounts" />
+                عرض الحسابات
+              </label>
+              <label class="permission-checkbox">
+                <input type="checkbox" name="perm_add_accounts" />
+                إضافة حسابات
+              </label>
+              <label class="permission-checkbox">
+                <input type="checkbox" name="perm_edit_accounts" />
+                تعديل الحسابات
+              </label>
+              <label class="permission-checkbox">
+                <input type="checkbox" name="perm_delete_accounts" />
+                حذف الحسابات
+              </label>
+              <label class="permission-checkbox">
+                <input type="checkbox" name="perm_add_entries" />
+                إضافة قيود
+              </label>
+              <label class="permission-checkbox">
+                <input type="checkbox" name="perm_edit_entries" />
+                تعديل القيود
+              </label>
+              <label class="permission-checkbox">
+                <input type="checkbox" name="perm_delete_entries" />
+                حذف القيود
+              </label>
+              <label class="permission-checkbox">
+                <input type="checkbox" name="perm_view_reports" />
+                عرض التقارير
+              </label>
+              <label class="permission-checkbox">
+                <input type="checkbox" name="perm_manage_users" />
+                إدارة المستخدمين
+              </label>
+              <label class="permission-checkbox">
+                <input type="checkbox" name="perm_year_settings" />
+                إعدادات السنة المالية
+              </label>
+            </div>
+          </div>
+
+          <button type="submit" class="primary">💾 إضافة الموظف</button>
+        </form>
+      </section>
+
+      <!-- قائمة المستخدمين -->
+      <section id="section-users-list" class="page">
+        <h2>قائمة الموظفين</h2>
+
+        <div class="users-stats card">
+          <div class="stat-box">
+            <div class="stat-number" id="stat-total">0</div>
+            <div class="stat-label">إجمالي الموظفين</div>
+          </div>
+          <div class="stat-box">
+            <div class="stat-number" id="stat-active">0</div>
+            <div class="stat-label">نشط</div>
+          </div>
+          <div class="stat-box">
+            <div class="stat-number" id="stat-inactive">0</div>
+            <div class="stat-label">غير نشط</div>
+          </div>
+        </div>
+
         <div class="card">
-          <table id="users-tbl">
-            <thead>
-              <tr>
-                <th>الاسم</th>
-                <th>البريد</th>
-                <th>الدور</th>
-                <th>تاريخ الإنشاء</th>
-                <th>الحالة</th>
-              </tr>
-            </thead>
-            <tbody></tbody>
-          </table>
+          <div class="filter-row">
+            <input
+              type="text"
+              id="search-users"
+              placeholder="ابحث عن موظف بالاسم أو البريد..."
+              style="flex: 1; max-width: 300px;"
+            />
+          </div>
+          <div class="responsive-table">
+            <table id="users-tbl">
+              <thead>
+                <tr>
+                  <th>الاسم</th>
+                  <th>البريد</th>
+                  <th>الهاتف</th>
+                  <th>الدور</th>
+                  <th>تاريخ الإنشاء</th>
+                  <th>الحالة</th>
+                  <th>الإجراءات</th>
+                </tr>
+              </thead>
+              <tbody></tbody>
+            </table>
+          </div>
         </div>
       </section>
     </main>
