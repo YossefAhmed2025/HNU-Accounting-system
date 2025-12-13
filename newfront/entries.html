@@ -22,6 +22,7 @@
         <a href="trial-balance.html" class="nav-link">ميزان المراجعة</a>
         <a href="financial-position.html" class="nav-link">قائمة المركز المالي</a>
         <a href="income-statement.html" class="nav-link">قائمة الدخل</a>
+        <a href="reports.html" class="nav-link">التقارير</a>
         <a href="users.html" class="nav-link">المستخدمين</a>
         <a href="year-settings.html" class="nav-link">السنة المالية</a>
       </nav>
@@ -44,15 +45,34 @@
             /></label>
           </div>
 
-          <div id="transactions-container"></div>
+          <div class="entry-split-container">
+            <!-- الجانب المدين -->
+            <div class="entry-section debit-section">
+              <h3 class="section-title">الحسابات المدينة</h3>
+              <div id="debit-container"></div>
+              <button
+                type="button"
+                id="add-debit"
+                class="btn-add-transaction"
+              >
+                ➕ إضافة حساب مدين
+              </button>
+            </div>
 
-          <button
-            type="button"
-            id="add-transaction"
-            class="btn-add-transaction"
-          >
-            ➕ إضافة عملية جديدة
-          </button>
+            <!-- الجانب الدائن -->
+            <div class="entry-section credit-section">
+              <h3 class="section-title">الحسابات الدائنة</h3>
+              <div id="credit-container"></div>
+              <button
+                type="button"
+                id="add-credit"
+                class="btn-add-transaction"
+              >
+                ➕ إضافة حساب دائن
+              </button>
+            </div>
+          </div>
+
           <button type="submit" class="primary">💾 حفظ القيد</button>
         </form>
 
@@ -64,9 +84,10 @@
                 <th>التاريخ</th>
                 <th>الحساب المدين</th>
                 <th>مركز التكلفة المدين</th>
+                <th>المبلغ المدين</th>
                 <th>الحساب الدائن</th>
                 <th>مركز التكلفة الدائن</th>
-                <th>المبلغ</th>
+                <th>المبلغ الدائن</th>
                 <th>البيان</th>
                 <th>رقم القيد</th>
                 <th>إجراءات</th>
